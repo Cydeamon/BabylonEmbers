@@ -7,6 +7,8 @@ Game::Game()
 
 void Game::Run()
 {
+    GameObject obj1({100, 10});
+
     while (Engine::IsRunning())
     {   
         Engine::Draw();

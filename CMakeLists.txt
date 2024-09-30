@@ -34,6 +34,8 @@ add_executable(
     Sources/Config.h
     Sources/Engine/Engine.h
     Sources/Engine/Engine.cpp
+    Sources/Engine/GameObjects/GameObject.h
+    Sources/Engine/GameObjects/GameObject.cpp
     Sources/Game/Game.h
     Sources/Game/Game.cpp
 )

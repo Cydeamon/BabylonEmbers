@@ -1,5 +1,6 @@
 #include "Engine.h"
 #include <stdexcept>
+#include <vector>
 
 namespace Engine
 {    
@@ -7,6 +8,7 @@ namespace Engine
     /***************************************  Variables  ***************************************/
     /*******************************************************************************************/
 
+    std::vector<GameObject*> gameObjects;
     bool isInternalResolutionSet = false;
     Vector2 internalResolution = {0, 0};
     Vector2 windowSize = {1280, 720};
@@ -50,7 +52,10 @@ namespace Engine
 
             BeginMode2D(worldSpaceCamera);
             {
-
+                for(GameObject *obj : gameObjects)
+                {
+                    obj->Draw();
+                }
             }
             EndMode2D();
         }
@@ -79,5 +84,13 @@ namespace Engine
         target = LoadRenderTexture(internalResolution.x, internalResolution.y);
         sourceRec = { 0.0f, 0.0f, (float)target.texture.width, -(float)target.texture.height };
         destRec = { -renderRatio, -renderRatio, windowSize.x + (renderRatio*2), windowSize.y + (renderRatio*2) };
+    }
+    
+    void RegisterGameObject(GameObject *obj)
+    {
+        if (obj == nullptr)
+            throw std::runtime_error("Engine::RegisterGameObject - Object expected, null given");
+
+        gameObjects.push_back(obj);
     }
 }

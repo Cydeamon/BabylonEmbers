@@ -1,10 +1,9 @@
 #pragma once
 
-#undef near
-#undef far
 #include <raylib.h>
 #include <physac.h>
 #include <Config.h>
+#include "GameObjects/GameObject.h"
 
 namespace Engine
 {    
@@ -12,4 +11,5 @@ namespace Engine
     bool IsRunning();
     void Draw();
     void SetInternalResolution(Vector2 resolution);
+    void RegisterGameObject(GameObject* obj);
 }
