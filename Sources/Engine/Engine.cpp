@@ -39,7 +39,7 @@ namespace Engine
 
     bool IsRunning()
     {
-        return WindowShouldClose();
+        return !WindowShouldClose();
     }
 
     void Draw()
@@ -50,7 +50,7 @@ namespace Engine
 
             BeginMode2D(worldSpaceCamera);
             {
-                DrawCircle(20, 20, 10, RED);
+
             }
             EndMode2D();
         }
@@ -64,8 +64,6 @@ namespace Engine
                 DrawTexturePro(target.texture, sourceRec, destRec, {0}, 0.0f, WHITE);
             EndMode2D();
 
-            DrawText(TextFormat("Screen resolution: %ix%i", windowSize.x, windowSize.y), 10, 10, 20, DARKBLUE);
-            DrawText(TextFormat("World resolution: %ix%i", internalResolution.x, internalResolution.y), 10, 40, 20, DARKGREEN);
             DrawFPS(GetScreenWidth() - 95, 10);
         }
         EndDrawing();
@@ -76,7 +74,7 @@ namespace Engine
         if (target.id)
             UnloadRenderTexture(target);
 
-        Engine::internalResolution = internalResolution;
+        internalResolution = resolution;
         renderRatio = internalResolution.x / internalResolution.y;
         target = LoadRenderTexture(internalResolution.x, internalResolution.y);
         sourceRec = { 0.0f, 0.0f, (float)target.texture.width, -(float)target.texture.height };

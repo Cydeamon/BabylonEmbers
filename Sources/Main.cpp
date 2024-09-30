@@ -18,7 +18,6 @@ int main()
     }
     catch (const std::exception &e)
     {
-        std::string title = std::string(PROJECT_LABEL) + ". Fatal error";
-        MessageBox(NULL, e.what(), title.c_str(), MB_OK | MB_ICONERROR | MB_TOPMOST);
+        std::cerr << "Fatal Error. " << e.what() << std::endl;
     }
 }
