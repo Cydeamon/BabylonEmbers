@@ -151,7 +151,7 @@ for executable_path in executables:
         if "=>" in line:
             # Add path to library_path if it is not equal to "not found"
             if "not found" not in line:
-                matches = re.findall("^\s*([\w\.\d+-]+) => ([/\w\.\d+ -]+)(?: \(.*\))?", line)
+                matches = re.findall(r"^\s*([\w\.\d+-]+) => ([/\w\.\d+ -]+)(?: \(.*\))?", line)
 
                 if platform.system() == "Windows":
                     current_drive = os.path.splitdrive(os.getcwd())[0][0].lower()

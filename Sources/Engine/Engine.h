@@ -3,6 +3,7 @@
 #undef near
 #undef far
 #include <raylib.h>
+#include <physac.h>
 #include <Config.h>
 
 namespace Engine

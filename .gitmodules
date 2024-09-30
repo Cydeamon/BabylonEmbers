@@ -1,0 +1,3 @@
+[submodule "Sources/Engine/Vendor/Physac"]
+	path = Sources/Engine/Vendor/Physac
+	url = https://github.com/victorfisac/Physac.git

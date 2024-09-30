@@ -6,4 +6,4 @@
 #define PROJECT_VER_MAJOR 0
 #define PROJECT_VER_MINOR 1
 #define PROJECT_VER_PATCH 0
-#define PROJECT_BUILD_TYPE "Debug"
+#define PROJECT_BUILD_TYPE "Release"
