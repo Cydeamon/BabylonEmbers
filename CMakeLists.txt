@@ -36,6 +36,10 @@ add_executable(
     Sources/Engine/Engine.cpp
     Sources/Engine/GameObjects/GameObject.h
     Sources/Engine/GameObjects/GameObject.cpp
+    Sources/Engine/GameObjects/PhysicsRectangle.cpp
+    Sources/Engine/GameObjects/PhysicsRectangle.cpp
+    Sources/Game/Brick.h
+    Sources/Game/Brick.cpp
     Sources/Game/Game.h
     Sources/Game/Game.cpp
 )
@@ -45,6 +49,7 @@ target_include_directories(
     Sources/
     Sources/Engine/Vendor/Physac/src/
 )
+
 set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "${PROJECT_NAME}_${PROJECT_VERSION}_${CMAKE_BUILD_TYPE}")
 target_link_libraries(${PROJECT_NAME} raylib)
 configure_file("${PROJECT_SOURCE_DIR}/Sources/Config.h.in" "${PROJECT_SOURCE_DIR}/Sources/Config.h")

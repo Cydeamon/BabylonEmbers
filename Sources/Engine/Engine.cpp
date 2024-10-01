@@ -39,6 +39,11 @@ namespace Engine
         screenSpaceCamera.zoom = 1.0f;
     }
 
+    void Deinit()
+    {
+        CloseWindow();
+    }
+
     bool IsRunning()
     {
         return !WindowShouldClose();
@@ -92,5 +97,12 @@ namespace Engine
             throw std::runtime_error("Engine::RegisterGameObject - Object expected, null given");
 
         gameObjects.push_back(obj);
+    }
+    Vector2 GetInternalResolution()
+    {
+        if (!isInternalResolutionSet)
+            return windowSize;
+
+        return internalResolution;
     }
 }
