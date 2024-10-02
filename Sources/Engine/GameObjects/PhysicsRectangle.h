@@ -2,13 +2,13 @@
 
 #include <Engine/Engine.h>
 
-class PhysicsRectangle : GameObject
+class PhysicsRectangle : public GameObject
 {
 public: 
     enum BodyType { STATIC, DYNAMIC, KINEMATIC };
 
     PhysicsRectangle(Vector2 position, Vector2 size, BodyType type = BodyType::DYNAMIC);
-    ~PhysicsRectangle();
+    ~PhysicsRectangle() override;
     void Draw() override;
     void Update() override;
 
@@ -22,11 +22,16 @@ public:
     void SetFriction(float friction) { shapeDef.friction = friction; }
     void SetPadding(float padding);
     bool IsPointWithinBody(Vector2 point);
+    void SetRotation(Vector2 rotation);
+    void SetRotation(b2Rot rotation);
+    float GetRotationDeg();
+    Vector2 GetRotationDirection();
+    b2BodyId GetBodyId() { return bodyId; }
+    Vector2 GetPosition() { return position; }
 
 protected: 
     Vector2 position = {0};
     Vector2 size = {0};
-    b2Rot rotation;
     Color color = BLACK;
     bool drawOutline = false;
     int outlineThickness = 1;

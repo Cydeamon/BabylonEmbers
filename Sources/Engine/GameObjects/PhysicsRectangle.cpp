@@ -36,7 +36,7 @@ void PhysicsRectangle::Draw()
     DrawRectanglePro(
         {position.x,position.y, size.x, size.y },
         {0}, 
-        RAD2DEG * b2Rot_GetAngle(rotation),
+        GetRotationDeg(),
         color
     );
 }
@@ -44,9 +44,10 @@ void PhysicsRectangle::Draw()
 void PhysicsRectangle::Update()
 {    
     b2Vec2 pos = b2Body_GetWorldPoint(bodyId, { -extent.x, -extent.y });
-    float radians = b2Rot_GetAngle(rotation);
-    rotation = b2Body_GetRotation(bodyId);
     position = {pos.x, pos.y};
+
+    if (position.x < 0 || position.x > Engine::GetInternalResolution().x || position.y < 0 || position.y > Engine::GetInternalResolution().y)
+        QueueDestroy();
 }
 
 void PhysicsRectangle::SetPadding(float padding)
@@ -66,4 +67,26 @@ void PhysicsRectangle::SetPadding(float padding)
 bool PhysicsRectangle::IsPointWithinBody(Vector2 point)
 {
     return b2Shape_TestPoint(shapeId, {point.x, point.y});
+}
+
+void PhysicsRectangle::SetRotation(Vector2 rotation)
+{
+    b2Body_SetTransform(bodyId, {position.x, position.y}, {rotation.x, rotation.y});
+}
+
+void PhysicsRectangle::SetRotation(b2Rot rotation)
+{
+    b2Body_SetTransform(bodyId, {position.x, position.y}, rotation);
+}
+
+float PhysicsRectangle::GetRotationDeg()
+{
+    b2Rot rotation = b2Body_GetRotation(bodyId);
+    return RAD2DEG * b2Rot_GetAngle(rotation);
+}
+
+Vector2 PhysicsRectangle::GetRotationDirection()
+{
+    b2Rot rotation = b2Body_GetRotation(bodyId);
+    return {rotation.c, rotation.s};
 }

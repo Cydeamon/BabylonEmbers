@@ -42,7 +42,7 @@ namespace Engine
         Engine::windowSize = windowSize;
         std::string title = std::string(PROJECT_LABEL) + " " + std::string(PROJECT_VER);
         InitWindow(windowSize.x, windowSize.y, title.c_str());
-        SetTargetFPS(60);
+        // SetTargetFPS(60);
         SetInternalResolution(internalResolution);
 
         worldSpaceCamera.zoom = 1.0f;
@@ -95,7 +95,8 @@ namespace Engine
                 DrawTexturePro(target.texture, sourceRec, destRec, {0}, 0.0f, WHITE);
             EndMode2D();
 
-            DrawFPS(GetScreenWidth() - 95, 10);
+            if (IsDebug())
+                DrawFPS(GetScreenWidth() - 95, 10);
         }
         EndDrawing();
     }
@@ -158,8 +159,18 @@ namespace Engine
         {
             b2World_Step(physWorldId, GetFrameTime(), 4);
         
-            for(GameObject *obj : gameObjects)
-                obj->Update();
+            for (int i = 0; i < gameObjects.size(); i++)
+            {
+                GameObject *obj = gameObjects[i];
+
+                if (obj->IsDestroyQueued())
+                {
+                    delete obj;
+                    i = 0;
+                }
+                else
+                    obj->Update();
+            }
         }
     }
     

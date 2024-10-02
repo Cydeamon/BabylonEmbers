@@ -9,5 +9,6 @@ public:
     void Update() override;
     
 private: 
+    void destroy();
     int health = 3;    
 };

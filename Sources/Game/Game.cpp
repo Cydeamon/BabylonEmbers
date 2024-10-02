@@ -33,6 +33,14 @@ void Game::prepareScene()
         PhysicsRectangle::BodyType::STATIC
     );
 
+    // PhysicsRectangle *floor2 = new PhysicsRectangle(
+    //     {50, (float) floorY - 5}, 
+    //     {5, 5}, 
+    //     PhysicsRectangle::BodyType::STATIC
+    // );
+
+    // Brick *testBrick = new Brick({50, 100}, {140, 80});
+
     generateTower();
 
     floor->SetDensity(0);
