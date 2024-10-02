@@ -8,7 +8,8 @@ namespace Engine
     /***************************************  Variables  ***************************************/
     /*******************************************************************************************/
 
-    std::vector<GameObject*> gameObjects;
+    // Window and rendering
+    bool isPaused = false;
     bool isInternalResolutionSet = false;
     Vector2 internalResolution = {0, 0};
     Vector2 windowSize = {1280, 720};
@@ -19,12 +20,20 @@ namespace Engine
     Rectangle sourceRec = {0};
     Rectangle destRec = {0};
 
+    // Game objects
+    std::vector<GameObject*> gameObjects;
+
+    // Physics    
+    b2WorldDef physWorldDef = {0};
+    b2WorldId physWorldId = {0};
+
     /*******************************************************************************************/
     /***************************************  Functions  ***************************************/
     /*******************************************************************************************/
 
     void Init(Vector2 windowSize, Vector2 internalResolution)
     {
+        // Init render and window
         if (internalResolution.x == 0 || internalResolution.y == 0)
             internalResolution = windowSize;
         else
@@ -33,14 +42,21 @@ namespace Engine
         Engine::windowSize = windowSize;
         std::string title = std::string(PROJECT_LABEL) + " " + std::string(PROJECT_VER);
         InitWindow(windowSize.x, windowSize.y, title.c_str());
+        SetTargetFPS(60);
         SetInternalResolution(internalResolution);
 
         worldSpaceCamera.zoom = 1.0f;
-        screenSpaceCamera.zoom = 1.0f;
+        screenSpaceCamera.zoom = 1.0f;        
+
+        // Init physics
+        physWorldDef = b2DefaultWorldDef();
+        physWorldDef.gravity = {0, 9.8 * 8};
+        physWorldId = b2CreateWorld(&physWorldDef);
     }
 
     void Deinit()
     {
+        b2DestroyWorld(physWorldId);
         CloseWindow();
     }
 
@@ -91,18 +107,35 @@ namespace Engine
         destRec = { -renderRatio, -renderRatio, windowSize.x + (renderRatio*2), windowSize.y + (renderRatio*2) };
     }
     
-    void RegisterGameObject(GameObject *obj)
+    void RegisterGameObject(GameObject* obj)
     {
-        if (obj == nullptr)
+        if (!obj)
             throw std::runtime_error("Engine::RegisterGameObject - Object expected, null given");
 
         gameObjects.push_back(obj);
     }
+
     Vector2 GetInternalResolution()
     {
         if (!isInternalResolutionSet)
             return windowSize;
 
         return internalResolution;
+    }
+    
+    void Update()
+    {
+        if (!isPaused)
+        {
+            b2World_Step(physWorldId, GetFrameTime(), 4);
+        
+            for(GameObject *obj : gameObjects)
+                obj->Update();
+        }
+    }
+    
+    b2WorldId GetPhysWorldID()
+    {
+        return physWorldId;
     }
 }

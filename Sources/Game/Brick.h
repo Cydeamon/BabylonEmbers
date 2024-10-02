@@ -5,7 +5,7 @@
 class Brick : public PhysicsRectangle
 {
 public:
-    Brick(Vector2 position = {0}, Vector2 size = {0});
+    Brick(Vector2 position = {0}, Vector2 size = {0}, float gap = 0);
     
 private: 
     int health = 3;    

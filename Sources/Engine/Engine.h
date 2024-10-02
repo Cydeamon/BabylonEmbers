@@ -3,6 +3,7 @@
 #include <raylib.h>
 #include <Config.h>
 #include "GameObjects/GameObject.h"
+#include <box2d/box2d.h>
 
 namespace Engine
 {    
@@ -13,4 +14,8 @@ namespace Engine
     void SetInternalResolution(Vector2 resolution);
     void RegisterGameObject(GameObject* obj);
     Vector2 GetInternalResolution();
+    void Update();
+
+    // Physics
+    b2WorldId GetPhysWorldID();
 }

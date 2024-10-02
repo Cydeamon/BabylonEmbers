@@ -10,11 +10,24 @@ Game::Game()
 
 void Game::Run()
 {
-    PhysicsRectangle floor({0, floorY}, {480, floorHeight});
+    PhysicsRectangle floor(
+        {0, floorY}, 
+        {480, floorHeight}, 
+        PhysicsRectangle::BodyType::STATIC
+    );
+    
     generateTower();
+
+    floor.SetDensity(0);
+    floor.SetFriction(0);
 
     while (Engine::IsRunning())
     {   
+        // Update 
+        Engine::Update();
+
+        
+        // Draw
         Engine::Draw();
     }
 
@@ -36,7 +49,7 @@ void Game::generateTower()
         {
             float randomWidth = (rand() % (maxBrickWidth - minBrickWidth)) + minBrickWidth;
             float brickWidth = widthLeft > maxBrickWidth ? randomWidth : widthLeft;
-            bricks.push_back(new Brick(Vector2{x, y}, Vector2{brickWidth, brickHeightInPX}));
+            bricks.push_back(new Brick(Vector2{x, y}, Vector2{brickWidth, brickHeightInPX}, gapBetweenBricksInPX));
             widthLeft -= brickWidth;
             x += brickWidth + gapBetweenBricksInPX;
         }

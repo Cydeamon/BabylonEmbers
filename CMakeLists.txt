@@ -21,6 +21,7 @@ if (NOT raylib_FOUND)
     endif()
 endif()
 
+add_subdirectory(Sources/Engine/Vendor/Box2D)
 
 # Project
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/Bin)
@@ -48,8 +49,9 @@ target_include_directories(
     ${PROJECT_NAME} PUBLIC 
     Sources/
     Sources/Engine/Vendor/Physac/src/
+    Sources/Engine/Vendor/Box2D/include/
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "${PROJECT_NAME}_${PROJECT_VERSION}_${CMAKE_BUILD_TYPE}")
-target_link_libraries(${PROJECT_NAME} raylib)
+target_link_libraries(${PROJECT_NAME} raylib box2d)
 configure_file("${PROJECT_SOURCE_DIR}/Sources/Config.h.in" "${PROJECT_SOURCE_DIR}/Sources/Config.h")
