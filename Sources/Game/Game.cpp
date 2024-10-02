@@ -10,16 +10,7 @@ Game::Game()
 
 void Game::Run()
 {
-    PhysicsRectangle floor(
-        {0, floorY}, 
-        {480, floorHeight}, 
-        PhysicsRectangle::BodyType::STATIC
-    );
-    
-    generateTower();
-
-    floor.SetDensity(0);
-    floor.SetFriction(0);
+    prepareScene();
 
     while (Engine::IsRunning())
     {   
@@ -32,6 +23,20 @@ void Game::Run()
     }
 
     Engine::Deinit();
+}
+
+void Game::prepareScene()
+{
+    PhysicsRectangle *floor = new PhysicsRectangle(
+        {0, (float) floorY}, 
+        {480, (float) floorHeight}, 
+        PhysicsRectangle::BodyType::STATIC
+    );
+    
+    generateTower();
+
+    floor->SetDensity(0);
+    floor->SetFriction(1);
 }
 
 void Game::generateTower()

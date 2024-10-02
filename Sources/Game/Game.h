@@ -14,8 +14,6 @@ public:
 
 private:
     std::vector<Brick *> bricks;
-
-    void generateTower();
 	float brickHeightInPX = 8;
 	int towerHeightInBricks = 15;
 	float gapBetweenBricksInPX = 1;
@@ -25,4 +23,7 @@ private:
 	int sidesOffsetPerLine = 2;
 	int minBrickWidth = 10;
 	int maxBrickWidth = 20;
+
+	void prepareScene();
+    void generateTower();
 };
