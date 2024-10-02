@@ -204,10 +204,10 @@ if os.path.exists("./Shaders/"):
 
 # Open deploy folder in explorer
 if platform.system() == "Windows":
-    # publish("windows", project_version)
+    publish("windows", project_version)
     os.startfile(os.path.abspath("./Deploy/Windows"))
 elif platform.system() == "Linux":
-    # publish("linux", project_version)
+    publish("linux", project_version)
     os.system("xdg-open ./Deploy/Linux")
 
 # Archive and delete folder
