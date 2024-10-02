@@ -8,6 +8,7 @@ public:
     enum BodyType { STATIC, DYNAMIC, KINEMATIC };
 
     PhysicsRectangle(Vector2 position, Vector2 size, BodyType type = BodyType::DYNAMIC);
+    ~PhysicsRectangle();
     void Draw() override;
     void Update() override;
 
@@ -20,6 +21,7 @@ public:
     void SetDensity(float density) { shapeDef.density = density; }
     void SetFriction(float friction) { shapeDef.friction = friction; }
     void SetPadding(float padding);
+    bool IsPointWithinBody(Vector2 point);
 
 protected: 
     Vector2 position = {0};
@@ -36,6 +38,7 @@ protected:
     b2BodyId bodyId;
     b2Polygon bodyCube;
     b2ShapeDef shapeDef;
+    b2ShapeId shapeId;
     b2Vec2 extent;
     
 };

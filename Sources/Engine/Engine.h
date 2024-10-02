@@ -10,10 +10,13 @@ namespace Engine
     void Init(Vector2 windowSize, Vector2 internalResolution = {0, 0});
     void Deinit();
     bool IsRunning();
+    bool IsDebug();
     void Draw();
     void SetInternalResolution(Vector2 resolution);
     void RegisterGameObject(GameObject* obj);
+    void UnregisterGameObject(GameObject* obj);
     Vector2 GetInternalResolution();
+    Vector2 GetMousePositionScaled();
     void Update();
 
     // Physics

@@ -65,6 +65,11 @@ namespace Engine
         return !WindowShouldClose();
     }
 
+    bool IsDebug()
+    {
+        return PROJECT_BUILD_TYPE == "Debug";
+    }
+
     void Draw()
     {        
         BeginTextureMode(target);
@@ -115,6 +120,18 @@ namespace Engine
         gameObjects.push_back(obj);
     }
 
+    void UnregisterGameObject(GameObject *obj)
+    {
+        for (int i = 0; i < gameObjects.size(); i++)
+        {
+            if (gameObjects[i] == obj)
+            {
+                gameObjects.erase(gameObjects.begin() + i);
+                break;
+            }
+        }
+    }
+
     Vector2 GetInternalResolution()
     {
         if (!isInternalResolutionSet)
@@ -122,7 +139,19 @@ namespace Engine
 
         return internalResolution;
     }
-    
+
+    Vector2 GetMousePositionScaled()
+    {
+        Vector2 pos = GetMousePosition();
+
+        pos.x /= windowSize.x / internalResolution.x;
+        pos.y /= windowSize.y / internalResolution.y;
+        pos.x = (int) pos.x;
+        pos.y = (int) pos.y;
+
+        return pos;
+    }
+
     void Update()
     {
         if (!isPaused)

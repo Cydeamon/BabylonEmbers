@@ -32,7 +32,7 @@ void Game::prepareScene()
         {480, (float) floorHeight}, 
         PhysicsRectangle::BodyType::STATIC
     );
-    
+
     generateTower();
 
     floor->SetDensity(0);

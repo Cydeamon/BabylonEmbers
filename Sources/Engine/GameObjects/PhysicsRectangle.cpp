@@ -22,7 +22,13 @@ PhysicsRectangle::PhysicsRectangle(Vector2 position, Vector2 size, BodyType type
     bodyId = b2CreateBody(Engine::GetPhysWorldID(), &bodyDef);
     bodyCube = b2MakeBox(extent.x, extent.y);
     shapeDef = b2DefaultShapeDef();
-    b2CreatePolygonShape(bodyId, &shapeDef, &bodyCube);
+    shapeId = b2CreatePolygonShape(bodyId, &shapeDef, &bodyCube);
+    b2Shape_EnableHitEvents(shapeId, true);
+}
+
+PhysicsRectangle::~PhysicsRectangle()
+{
+    b2DestroyBody(bodyId);
 }
 
 void PhysicsRectangle::Draw()
@@ -53,5 +59,11 @@ void PhysicsRectangle::SetPadding(float padding)
     bodyId = b2CreateBody(Engine::GetPhysWorldID(), &bodyDef);
     bodyCube = b2MakeBox(extent.x, extent.y);
     shapeDef = b2DefaultShapeDef();
-    b2CreatePolygonShape(bodyId, &shapeDef, &bodyCube);
+    shapeId = b2CreatePolygonShape(bodyId, &shapeDef, &bodyCube);
+    b2Shape_EnableHitEvents(shapeId, true);
+}
+
+bool PhysicsRectangle::IsPointWithinBody(Vector2 point)
+{
+    return b2Shape_TestPoint(shapeId, {point.x, point.y});
 }

@@ -7,6 +7,11 @@ GameObject::GameObject(Vector2 position)
     Engine::RegisterGameObject(this);
 }
 
+GameObject::~GameObject()
+{
+    Engine::UnregisterGameObject(this);
+}
+
 void GameObject::Draw()
 {
     DrawCircle(position.x + 10, position.y + 10, 10, {255, 0, 255, 255});

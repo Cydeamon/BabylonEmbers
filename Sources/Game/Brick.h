@@ -6,6 +6,7 @@ class Brick : public PhysicsRectangle
 {
 public:
     Brick(Vector2 position = {0}, Vector2 size = {0}, float gap = 0);
+    void Update() override;
     
 private: 
     int health = 3;    
