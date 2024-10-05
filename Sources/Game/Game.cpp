@@ -68,6 +68,9 @@ void Game::generateTower()
         }
     }
 
-    // TowerTop.Position = new(0, towerTopRowY - towerTopHeight - 10);
-    // TowerTop.GlobalPosition = new(GetViewportRect().Size.X / 2, TowerTop.GlobalPosition.Y);
+    towerTop = new TowerTop();
+    towerTop->SetPosition({
+        1 + (Engine::GetInternalResolution().x / 2) - (towerTop->GetSize().x / 2), 
+        towerTopRowY - towerTop->GetSize().y - gapBetweenBricksInPX
+    });
 }

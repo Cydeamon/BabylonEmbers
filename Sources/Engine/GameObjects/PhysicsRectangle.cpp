@@ -23,7 +23,6 @@ PhysicsRectangle::PhysicsRectangle(Vector2 position, Vector2 size, BodyType type
     bodyCube = b2MakeBox(extent.x, extent.y);
     shapeDef = b2DefaultShapeDef();
     shapeId = b2CreatePolygonShape(bodyId, &shapeDef, &bodyCube);
-    b2Shape_EnableHitEvents(shapeId, true);
 }
 
 PhysicsRectangle::~PhysicsRectangle()

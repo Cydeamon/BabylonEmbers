@@ -42,7 +42,7 @@ namespace Engine
         Engine::windowSize = windowSize;
         std::string title = std::string(PROJECT_LABEL) + " " + std::string(PROJECT_VER);
         InitWindow(windowSize.x, windowSize.y, title.c_str());
-        // SetTargetFPS(60);
+        SetTargetFPS(60);
         SetInternalResolution(internalResolution);
 
         worldSpaceCamera.zoom = 1.0f;

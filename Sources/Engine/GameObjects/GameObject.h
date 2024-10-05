@@ -13,7 +13,10 @@ public:
     void QueueDestroy() { destroyQueued = true; }
     bool IsDestroyQueued() { return destroyQueued; }
 
-private:
+    virtual void SetPosition(Vector2 pos) { position = pos; }
+    Vector2 GetPosition() { return position; }
+
+protected:
     Vector2 position = {0};
     bool destroyQueued = false;
 

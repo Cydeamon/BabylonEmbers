@@ -4,6 +4,7 @@
 
 #include <Engine/Engine.h>
 #include "Brick.h"
+#include "TowerTop.h"
 #include <vector>
 
 class Game
@@ -23,6 +24,7 @@ private:
 	int sidesOffsetPerLine = 2;
 	int minBrickWidth = 10;
 	int maxBrickWidth = 20;
+	TowerTop* towerTop = nullptr;
 
 	void prepareScene();
     void generateTower();
