@@ -33,14 +33,6 @@ void Game::prepareScene()
         PhysicsRectangle::BodyType::STATIC
     );
 
-    // PhysicsRectangle *floor2 = new PhysicsRectangle(
-    //     {50, (float) floorY - 5}, 
-    //     {5, 5}, 
-    //     PhysicsRectangle::BodyType::STATIC
-    // );
-
-    // Brick *testBrick = new Brick({50, 100}, {140, 80});
-
     generateTower();
 
     floor->SetDensity(0);
@@ -72,5 +64,11 @@ void Game::generateTower()
     towerTop->SetPosition({
         1 + (Engine::GetInternalResolution().x / 2) - (towerTop->GetSize().x / 2), 
         towerTopRowY - towerTop->GetSize().y - gapBetweenBricksInPX
+    });
+
+    player = new Player();
+    player->SetPosition({
+        (Engine::GetInternalResolution().x / 2) - (player->GetSize().x / 2), 
+        towerTopRowY - player->GetSize().y - 10.0f
     });
 }

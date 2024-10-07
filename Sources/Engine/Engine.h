@@ -4,6 +4,7 @@
 #include <Config.h>
 #include "GameObjects/GameObject.h"
 #include <box2d/box2d.h>
+#include <vector>
 
 namespace Engine
 {    
@@ -18,7 +19,9 @@ namespace Engine
     Vector2 GetInternalResolution();
     Vector2 GetMousePositionScaled();
     void Update();
+    void ResortObjects();
 
     // Physics
     b2WorldId GetPhysWorldID();
+    void AttachPhysShapeToBody(b2BodyId bodyId, std::vector<b2Vec2> vertices);
 }

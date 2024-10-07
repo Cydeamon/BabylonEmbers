@@ -4,9 +4,14 @@
 
 Brick::Brick(Vector2 position, Vector2 size, float gap) : PhysicsRectangle(position, size, DYNAMIC)
 {
-    SetDensity(1);
-    SetFriction(0.01);
+    SetDensity(2);
+    SetFriction(0);
     SetPadding(gap);
+}
+
+Brick::~Brick()
+{
+    std::cout << "OH NO" << std::endl;
 }
 
 void Brick::Update() 
@@ -46,7 +51,7 @@ void Brick::destroy()
             float forceX = (rand() % maxForce * 2) - maxForce;
             float forceY = (rand() % maxForce * 2) - maxForce;
 
-            piece->SetDensity(0.1);
+            piece->SetDensity(100);
             piece->SetColor(BLACK);
             b2Body_ApplyLinearImpulse(piece->GetBodyId(), {forceX, forceY}, b2Body_GetWorldCenterOfMass(piece->GetBodyId()), true);
         }

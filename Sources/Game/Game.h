@@ -5,6 +5,7 @@
 #include <Engine/Engine.h>
 #include "Brick.h"
 #include "TowerTop.h"
+#include "Player.h"
 #include <vector>
 
 class Game
@@ -25,6 +26,7 @@ private:
 	int minBrickWidth = 10;
 	int maxBrickWidth = 20;
 	TowerTop* towerTop = nullptr;
+	Player* player = nullptr;
 
 	void prepareScene();
     void generateTower();

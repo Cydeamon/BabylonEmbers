@@ -24,5 +24,4 @@ private:
     b2Vec2 extent;
     
     void initPhysicsBody();
-    void attachShapeToBody(b2BodyId bodyId, std::vector<b2Vec2> vertices);
 };

@@ -20,3 +20,9 @@ void GameObject::Draw()
     char* message = "GameObject type is not set";
     DrawText("GameObject type is not set", position.x + 5 - (MeasureText(message, 8) / 2), position.y + 20, 8, RED);
 }
+
+void GameObject::SetDrawPriority(DrawPriority priority)
+{
+    drawPriority = priority; 
+    Engine::ResortObjects();
+}

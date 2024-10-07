@@ -1,6 +1,8 @@
 #include "Engine.h"
 #include <stdexcept>
 #include <vector>
+#include <iostream>
+#include <bits/stdc++.h>
 
 namespace Engine
 {    
@@ -13,6 +15,7 @@ namespace Engine
     bool isInternalResolutionSet = false;
     Vector2 internalResolution = {0, 0};
     Vector2 windowSize = {1280, 720};
+    Vector2 mousePositionScaled = {0};
     float renderRatio;
     Camera2D worldSpaceCamera = {0};
     Camera2D screenSpaceCamera = {0};
@@ -67,7 +70,7 @@ namespace Engine
 
     bool IsDebug()
     {
-        return PROJECT_BUILD_TYPE == "Debug";
+        return true; // PROJECT_BUILD_TYPE == "Debug";
     }
 
     void Draw()
@@ -78,10 +81,8 @@ namespace Engine
 
             BeginMode2D(worldSpaceCamera);
             {
-                for(GameObject *obj : gameObjects)
-                {
-                    obj->Draw();
-                }
+                for (int i = 0; i < gameObjects.size(); i++)
+                    gameObjects[i]->Draw();
             }
             EndMode2D();
         }
@@ -143,18 +144,19 @@ namespace Engine
 
     Vector2 GetMousePositionScaled()
     {
-        Vector2 pos = GetMousePosition();
-
-        pos.x /= windowSize.x / internalResolution.x;
-        pos.y /= windowSize.y / internalResolution.y;
-        pos.x = (int) pos.x;
-        pos.y = (int) pos.y;
-
-        return pos;
+        return mousePositionScaled;
     }
 
     void Update()
     {
+        // Update mouse position scaled        
+        mousePositionScaled = GetMousePosition();
+        mousePositionScaled.x /= windowSize.x / internalResolution.x;
+        mousePositionScaled.y /= windowSize.y / internalResolution.y;
+        mousePositionScaled.x = (int) mousePositionScaled.x;
+        mousePositionScaled.y = (int) mousePositionScaled.y;
+
+        // Update game objects if game is not paused
         if (!isPaused)
         {
             b2World_Step(physWorldId, GetFrameTime(), 4);
@@ -173,9 +175,35 @@ namespace Engine
             }
         }
     }
-    
+
+    bool compareGameObjects(GameObject* obj1, GameObject* obj2)
+    {
+        return obj1->GetDrawPriority() < obj2->GetDrawPriority();
+    }
+
+    void ResortObjects()
+    {
+        std::sort(gameObjects.begin(), gameObjects.end(), compareGameObjects); 
+    }
+
     b2WorldId GetPhysWorldID()
     {
         return physWorldId;
+    }
+    
+    void AttachPhysShapeToBody(b2BodyId bodyId, std::vector<b2Vec2> vertices)
+    {        
+        b2Vec2 verticesArr[vertices.size()];
+
+        for (int i = 0; i < vertices.size(); i++)
+            verticesArr[i] = vertices[i];
+
+        b2Hull hull = b2ComputeHull( verticesArr, vertices.size() );
+        b2Polygon shape = b2MakePolygon( &hull, 0.15f);
+        b2ShapeDef shapeDef = b2DefaultShapeDef();
+        shapeDef.density = 1.5;
+        shapeDef.friction = 5;
+
+        b2CreatePolygonShape( bodyId, &shapeDef, &shape );
     }
 }

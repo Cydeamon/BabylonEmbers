@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5.0)
-project(TowerDefender VERSION 0.2.0)
+project(TowerDefender VERSION 0.3.1)
 set (CMAKE_CXX_STANDARD 17)
 set (PROJECT_LABEL "Tower Defender")
 
@@ -41,6 +41,8 @@ add_executable(
     Sources/Engine/GameObjects/PhysicsRectangle.cpp
     Sources/Game/Brick.h
     Sources/Game/Brick.cpp
+    Sources/Game/Player.h
+    Sources/Game/Player.cpp
     Sources/Game/TowerTop.h
     Sources/Game/TowerTop.cpp
     Sources/Game/Game.h

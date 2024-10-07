@@ -3,7 +3,7 @@
 TowerTop::TowerTop()
 {
     towerTopTexture = LoadTexture("Assets/TowerTop.png");
-    initPhysicsBody();
+    initPhysicsBody();    
 }
 
 TowerTop::~TowerTop()
@@ -20,8 +20,6 @@ void TowerTop::Draw()
         1, 
         WHITE
     );
-
-
 }
 
 void TowerTop::Update()
@@ -44,23 +42,7 @@ void TowerTop::initPhysicsBody()
 	bodyDef.type = b2_dynamicBody;
 
 	physBodyId = b2CreateBody( Engine::GetPhysWorldID(), &bodyDef );    
-    attachShapeToBody(physBodyId, {{0, 0}, {3, 14}, {0, 14}});
-    attachShapeToBody(physBodyId, {{79, 0}, {79, 14}, {76, 14}});
-    attachShapeToBody(physBodyId, {{3, 15}, {76, 15}, {69, 26}, {10, 26}});
-}
-
-void TowerTop::attachShapeToBody(b2BodyId bodyId, std::vector<b2Vec2> vertices)
-{
-    b2Vec2 verticesArr[vertices.size()];
-
-    for (int i = 0; i < vertices.size(); i++)
-        verticesArr[i] = vertices[i];
-
-    b2Hull hull = b2ComputeHull( verticesArr, vertices.size() );
-	b2Polygon shape = b2MakePolygon( &hull, 0.15f);
-	b2ShapeDef shapeDef = b2DefaultShapeDef();
-	shapeDef.density = 1.0f;
-	shapeDef.friction = 0.2f;
-
-    b2CreatePolygonShape( bodyId, &shapeDef, &shape );
+    Engine::AttachPhysShapeToBody(physBodyId, {{0, 0}, {3, 14}, {0, 14}});
+    Engine::AttachPhysShapeToBody(physBodyId, {{79, 0}, {79, 14}, {76, 14}});
+    Engine::AttachPhysShapeToBody(physBodyId, {{3, 15}, {76, 15}, {69, 26}, {10, 26}});
 }
