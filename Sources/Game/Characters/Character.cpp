@@ -6,6 +6,7 @@ Character::Character()
     ragdollHeadTexture = LoadTexture("Assets/CharacterRagDollHead.png");
     ragdollBodyTexture = LoadTexture("Assets/CharacterRagDollBody.png");
     ragdollLegsTexture = LoadTexture("Assets/CharacterRagDollLegs.png");
+    lastFrameTime = GetTime();
 
     initPhysicsBody();
     SetDrawPriority(LOW);
@@ -19,6 +20,27 @@ void Character::Update()
 {
     if (!dead)
     {
+        // Progress animation
+        if (currentTexture != nullptr)
+        {
+            if (GetTime() - lastFrameTime > frameDuration)
+            {
+                if (repeatAnimation)
+                {
+                    curFrame = (curFrame + 1) % totalFrames;
+                }
+                else if (!animationPaused)
+                {
+                    if (curFrame < totalFrames - 1)
+                        curFrame++;
+                    else
+                        animationPaused = true;
+                }
+
+                lastFrameTime = GetTime();
+            }
+        }
+
         // Kill character on click in debug mode
         if (Engine::IsDebug())
         {
@@ -42,15 +64,33 @@ void Character::Draw()
 {    
     if (!dead)
     {
-        // DrawTextureEx(
-        //     characterTexture,
-        //     position,
-        //     RAD2DEG * b2Rot_GetAngle(b2Body_GetRotation(physBodyId)), 
-        //     1, 
-        //     BLACK
-        // );
+        if (currentTexture != nullptr)
+        {
+            Rectangle sourceRect = {
+                (float) (curFrame % curTextureCols) * size.x, 
+                (float) (curFrame / curTextureCols) * size.y, 
+                lookDirection.x < 0 ? -size.x : size.x, 
+                size.y
+            };
 
-        // TODO: Draw sprite 
+            DrawTexturePro(
+                *currentTexture,
+                sourceRect,
+                {position.x, position.y, size.x, size.y},
+                {0},
+                RAD2DEG * b2Rot_GetAngle(b2Body_GetRotation(physBodyId)), 
+                WHITE
+            );
+        }
+        else
+        {
+            DrawRectanglePro(
+                {position.x,position.y, size.x, size.y},
+                {0},
+                RAD2DEG * b2Rot_GetAngle(b2Body_GetRotation(physBodyId)), 
+                RED
+            );
+        }
     }
     else
     {
@@ -71,6 +111,17 @@ void Character::SetPosition(Vector2 pos)
 {
     position = pos;
     b2Body_SetTransform(physBodyId, {pos.x, pos.y}, b2Body_GetRotation(physBodyId));
+}
+
+void Character::SetAnimationTexture(Texture2D *texture)
+{
+    currentTexture = texture;
+    curTextureRows = texture->height / size.y;
+    curTextureCols = texture->width / size.x;
+    totalFrames = curTextureRows * curTextureCols;
+    curFrame = 0;
+    lastFrameTime = GetTime();
+    animationPaused = false;
 }
 
 void Character::initPhysicsBody()
@@ -167,5 +218,4 @@ void Character::createRagdollBodies()
         b2Body_GetLocalCenterOfMass(ragdollBodyId), 
         true
     );
-
 }

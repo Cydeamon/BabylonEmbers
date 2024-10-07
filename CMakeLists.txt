@@ -61,3 +61,4 @@ target_include_directories(
 set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "${PROJECT_NAME}_${CMAKE_BUILD_TYPE}")
 target_link_libraries(${PROJECT_NAME} raylib box2d)
 configure_file("${PROJECT_SOURCE_DIR}/Sources/Config.h.in" "${PROJECT_SOURCE_DIR}/Sources/Config.h")
+configure_file("${PROJECT_SOURCE_DIR}/resource.rc.in" "${PROJECT_SOURCE_DIR}/resource.rc")

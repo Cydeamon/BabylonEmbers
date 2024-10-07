@@ -9,6 +9,11 @@ public:
     Player();
     void Update() override;
 
+    enum PlayerState { IDLE, RUNNING };
+
 private:
+    Texture2D spritesheetTextureIdle;
+    Texture2D spritesheetTextureRunning;
+    PlayerState state = IDLE;
 
 };

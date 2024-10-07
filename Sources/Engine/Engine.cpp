@@ -54,6 +54,11 @@ namespace Engine
         worldSpaceCamera.zoom = 1.0f;
         screenSpaceCamera.zoom = 1.0f;        
 
+        // Set window icon
+        Image icon = LoadImage("Assets/icon-window.png");
+        SetWindowIcon(icon);
+        UnloadImage(icon);
+
         // Init physics
         physWorldDef = b2DefaultWorldDef();
         physWorldDef.gravity = {0, 9.8 * 8};

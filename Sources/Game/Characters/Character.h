@@ -13,6 +13,7 @@ public:
 
     Vector2 GetSize() { return size; }
     void SetPosition(Vector2 pos) override;
+    void SetAnimationTexture(Texture2D *texture);
 
 protected:
     Texture2D ragdollHeadTexture;
@@ -25,6 +26,17 @@ protected:
     b2Vec2 extent;
     float speed = 50;
     bool dead = false;
+    double frameDuration = 1.0f / 24.0f;
+    double lastFrameTime;
+    int curFrame = 0;
+    int totalFrames = 0;
+    bool repeatAnimation = true;
+    bool animationPaused = false;
+    Texture2D *currentTexture = nullptr;
+    int curTextureRows;
+    int curTextureCols;
+    b2Vec2 moveDirection = {0};
+    b2Vec2 lookDirection = {1, 0};
 
     // Ragdoll parts
     b2BodyId ragdollHeadId;
