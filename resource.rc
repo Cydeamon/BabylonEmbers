@@ -1,15 +1,15 @@
 #include <windows.h>
 
-#define APP_VERSION "0.3.1"
+#define APP_VERSION "0.3.2"
 #define APP_NAME "Tower Defender"
 #define APP_AUTHOR "Cydeamon"
-#define BUILD_TYPE "Debug"
-#define DESCRIPTION "Tower Defender 0.3.1. Debug version"
+#define BUILD_TYPE "Release"
+#define DESCRIPTION "Tower Defender 0.3.2. Release version"
 #define IDI_ICON1 101
 
 VS_VERSION_INFO VERSIONINFO
-FILEVERSION     0,3,1
-PRODUCTVERSION  0,3,1
+FILEVERSION     0,3,2
+PRODUCTVERSION  0,3,2
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
