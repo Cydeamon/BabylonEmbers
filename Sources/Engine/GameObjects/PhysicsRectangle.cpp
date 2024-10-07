@@ -28,7 +28,6 @@ PhysicsRectangle::PhysicsRectangle(Vector2 position, Vector2 size, BodyType type
 
 PhysicsRectangle::~PhysicsRectangle()
 {
-    std::cout << "OH GOD" << std::endl;
     b2DestroyBody(bodyId);
 }
 

@@ -5,6 +5,7 @@
 #include "GameObjects/GameObject.h"
 #include <box2d/box2d.h>
 #include <vector>
+#include <functional>
 
 namespace Engine
 {    
@@ -20,6 +21,7 @@ namespace Engine
     Vector2 GetMousePositionScaled();
     void Update();
     void ResortObjects();
+    void SetDrawHUDCallback(std::function<void(void)> callback);
 
     // Physics
     b2WorldId GetPhysWorldID();

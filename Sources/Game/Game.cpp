@@ -6,6 +6,8 @@ Game::Game()
 {
     Engine::Init({1600, 900}, {480, 270});
     floorY = Engine::GetInternalResolution().y - floorHeight;
+    font = LoadFont("Assets/Fonts/PressStart2P-Regular.ttf");
+    Engine::SetDrawHUDCallback(std::bind(&Game::drawUI, this));
 }
 
 void Game::Run()
@@ -20,6 +22,7 @@ void Game::Run()
         
         // Draw
         Engine::Draw();
+        
     }
 
     Engine::Deinit();
@@ -71,4 +74,17 @@ void Game::generateTower()
         (Engine::GetInternalResolution().x / 2) - (player->GetSize().x / 2), 
         towerTopRowY - player->GetSize().y - 10.0f
     });
+}
+
+void Game::showEndGameScreen()
+{
+    std::string msg = "YOU DIED";
+    int msgWidth = MeasureTextEx(font, msg.c_str(), 40, 0).x;
+    DrawTextEx(font, msg.c_str(), {Engine::GetInternalResolution().x / 2 - msgWidth / 2, Engine::GetInternalResolution().y / 2 - 50}, 40, 0, BLACK);
+}
+
+void Game::drawUI()
+{
+    if (player->IsDead())
+        showEndGameScreen();
 }

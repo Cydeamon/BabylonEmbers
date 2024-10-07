@@ -30,6 +30,9 @@ namespace Engine
     b2WorldDef physWorldDef = {0};
     b2WorldId physWorldId = {0};
 
+    // Callbacks    
+    std::function<void(void)> DrawHUDCallback;
+
     /*******************************************************************************************/
     /***************************************  Functions  ***************************************/
     /*******************************************************************************************/
@@ -83,6 +86,10 @@ namespace Engine
             {
                 for (int i = 0; i < gameObjects.size(); i++)
                     gameObjects[i]->Draw();
+
+                if (DrawHUDCallback)
+                    DrawHUDCallback();
+                
             }
             EndMode2D();
         }
@@ -184,6 +191,11 @@ namespace Engine
     void ResortObjects()
     {
         std::sort(gameObjects.begin(), gameObjects.end(), compareGameObjects); 
+    }
+
+    void SetDrawHUDCallback(std::function<void(void)> callback)
+    {
+        Engine::DrawHUDCallback = callback;
     }
 
     b2WorldId GetPhysWorldID()

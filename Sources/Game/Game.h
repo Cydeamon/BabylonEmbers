@@ -25,9 +25,12 @@ private:
 	int sidesOffsetPerLine = 2;
 	int minBrickWidth = 10;
 	int maxBrickWidth = 20;
+	Font font;
 	TowerTop* towerTop = nullptr;
 	Player* player = nullptr;
 
 	void prepareScene();
     void generateTower();
+	void showEndGameScreen();
+	void drawUI();
 };

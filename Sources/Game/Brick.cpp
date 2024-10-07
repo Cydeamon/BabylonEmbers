@@ -11,7 +11,6 @@ Brick::Brick(Vector2 position, Vector2 size, float gap) : PhysicsRectangle(posit
 
 Brick::~Brick()
 {
-    std::cout << "OH NO" << std::endl;
 }
 
 void Brick::Update() 
@@ -43,7 +42,7 @@ void Brick::destroy()
         {
             PhysicsRectangle *piece = new PhysicsRectangle(
                 {position.x + x, position.y + y}, 
-                {pieceSize, pieceSize}, 
+                {(float) pieceSize, (float) pieceSize}, 
                 PhysicsRectangle::BodyType::DYNAMIC
             );
 

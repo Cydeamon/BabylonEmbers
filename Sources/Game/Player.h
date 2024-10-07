@@ -9,6 +9,7 @@ public:
     ~Player();
     void Update() override;
     void Draw() override;
+    bool IsDead() { return dead; }
 
     Vector2 GetSize() { return {playerTexture.width, playerTexture.height}; }
     void SetPosition(Vector2 pos) override;

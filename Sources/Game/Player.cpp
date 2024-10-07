@@ -15,7 +15,6 @@ Player::Player()
 
 Player::~Player()
 {
-    std::cout << "OH NO, I'M DYING" << std::endl;
 }
 
 void Player::Update()
@@ -33,6 +32,14 @@ void Player::Update()
                     return;
                 }
             }
+        }
+
+        // Kill player if out of bounds
+        if (position.x + size.x < 0 || position.x - size.x > Engine::GetInternalResolution().x || 
+            position.y + size.y < 0 || position.y - size.y > Engine::GetInternalResolution().y)
+        {
+            die();
+            return;
         }
 
         // Update collisions data
@@ -122,9 +129,9 @@ void Player::createRagdollBodies()
 {
     // Create bodies
     Vector2 drawPos = {position.x + (size.x * 0.5f), position.y};
-    b2Vec2 headSize = {ragdollHeadTexture.width, ragdollHeadTexture.height};
-    b2Vec2 bodySize = {ragdollBodyTexture.width, ragdollBodyTexture.height};
-    b2Vec2 legsSize = {ragdollLegsTexture.width, ragdollLegsTexture.height};
+    b2Vec2 headSize = {(float) ragdollHeadTexture.width, (float) ragdollHeadTexture.height};
+    b2Vec2 bodySize = {(float) ragdollBodyTexture.width, (float) ragdollBodyTexture.height};
+    b2Vec2 legsSize = {(float) ragdollLegsTexture.width, (float) ragdollLegsTexture.height};
     ragdollHeadExtent = {0.5f * headSize.x, 0.5f * headSize.y};
     ragdollBodyExtent = {0.5f * bodySize.x, 0.5f * bodySize.y};
     ragdollLegsExtent = {0.5f * legsSize.x, 0.5f * legsSize.y};
