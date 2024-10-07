@@ -5,7 +5,7 @@
 #include <Engine/Engine.h>
 #include "Brick.h"
 #include "TowerTop.h"
-#include "Player.h"
+#include "Characters/Player.h"
 #include <vector>
 
 class Game

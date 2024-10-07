@@ -1,27 +1,25 @@
-#include "Player.h"
+#include "Character.h"
 #include <iostream>
 
-Player::Player()
+Character::Character()
 {
-    playerTexture = LoadTexture("Assets/Player.png");
-    ragdollHeadTexture = LoadTexture("Assets/PlayerRagDollHead.png");
-    ragdollBodyTexture = LoadTexture("Assets/PlayerRagDollBody.png");
-    ragdollLegsTexture = LoadTexture("Assets/PlayerRagDollLegs.png");
+    ragdollHeadTexture = LoadTexture("Assets/CharacterRagDollHead.png");
+    ragdollBodyTexture = LoadTexture("Assets/CharacterRagDollBody.png");
+    ragdollLegsTexture = LoadTexture("Assets/CharacterRagDollLegs.png");
 
-    size = {(float) playerTexture.width, (float) playerTexture.height};
     initPhysicsBody();
     SetDrawPriority(LOW);
 }
 
-Player::~Player()
+Character::~Character()
 {
 }
 
-void Player::Update()
+void Character::Update()
 {
     if (!dead)
     {
-        // Kill player on click in debug mode
+        // Kill character on click in debug mode
         if (Engine::IsDebug())
         {
             if (IsMouseButtonPressed(0))
@@ -34,49 +32,25 @@ void Player::Update()
             }
         }
 
-        // Kill player if out of bounds
-        if (position.x + size.x < 0 || position.x - size.x > Engine::GetInternalResolution().x || 
-            position.y + size.y < 0 || position.y - size.y > Engine::GetInternalResolution().y)
-        {
-            die();
-            return;
-        }
-
-        // Update collisions data
-        int capacity = b2Body_GetContactCapacity(physBodyId);
-        
-        // Apply gravity
-        if (capacity)
-        {
-            b2Vec2 finalVelocity = b2Body_GetLinearVelocity(physBodyId);
-    
-            if (IsKeyDown(KEY_LEFT) && finalVelocity.x > -speed)
-                finalVelocity.x = -speed;
-            
-            if (IsKeyDown(KEY_RIGHT) && finalVelocity.x < speed)
-                finalVelocity.x = speed;
-
-            b2Body_SetLinearVelocity(physBodyId, finalVelocity);
-        }
-        
-
         // Get box2d result value
         b2Vec2 pos = b2Body_GetWorldPoint(physBodyId, { -extent.x, -extent.y });
         position = {pos.x, pos.y};
     }
 }
 
-void Player::Draw()
+void Character::Draw()
 {    
     if (!dead)
     {
-        DrawTextureEx(
-            playerTexture,
-            position,
-            RAD2DEG * b2Rot_GetAngle(b2Body_GetRotation(physBodyId)), 
-            1, 
-            BLACK
-        );
+        // DrawTextureEx(
+        //     characterTexture,
+        //     position,
+        //     RAD2DEG * b2Rot_GetAngle(b2Body_GetRotation(physBodyId)), 
+        //     1, 
+        //     BLACK
+        // );
+
+        // TODO: Draw sprite 
     }
     else
     {
@@ -93,13 +67,13 @@ void Player::Draw()
     }
 }
 
-void Player::SetPosition(Vector2 pos)
+void Character::SetPosition(Vector2 pos)
 {
     position = pos;
     b2Body_SetTransform(physBodyId, {pos.x, pos.y}, b2Body_GetRotation(physBodyId));
 }
 
-void Player::initPhysicsBody()
+void Character::initPhysicsBody()
 {
     b2BodyDef bodyDef = b2DefaultBodyDef();
 	bodyDef.type = b2_dynamicBody;
@@ -118,14 +92,14 @@ void Player::initPhysicsBody()
 }
 
 
-void Player::die()
+void Character::die()
 {
     dead = true;
     createRagdollBodies();
     b2DestroyBody(physBodyId);
 }
 
-void Player::createRagdollBodies()
+void Character::createRagdollBodies()
 {
     // Create bodies
     Vector2 drawPos = {position.x + (size.x * 0.5f), position.y};

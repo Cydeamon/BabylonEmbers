@@ -32,7 +32,7 @@ void Game::prepareScene()
 {
     PhysicsRectangle *floor = new PhysicsRectangle(
         {0, (float) floorY}, 
-        {480, (float) floorHeight}, 
+        {1000, (float) floorHeight}, 
         PhysicsRectangle::BodyType::STATIC
     );
 

@@ -2,24 +2,23 @@
 
 #include <Engine/Engine.h>
 
-class Player : public GameObject
+class Character : public GameObject
 {
 public:
-    Player();
-    ~Player();
+    Character();
+    ~Character();
     void Update() override;
     void Draw() override;
     bool IsDead() { return dead; }
 
-    Vector2 GetSize() { return {playerTexture.width, playerTexture.height}; }
+    Vector2 GetSize() { return size; }
     void SetPosition(Vector2 pos) override;
 
-private:
-    Texture2D playerTexture;
+protected:
     Texture2D ragdollHeadTexture;
     Texture2D ragdollBodyTexture;
     Texture2D ragdollLegsTexture;
-    Vector2 size;
+    Vector2 size = {16, 16};
     b2BodyId physBodyId; 
     b2ChainId physChainId;
     b2ShapeId physShapeId;

@@ -39,10 +39,12 @@ add_executable(
     Sources/Engine/GameObjects/GameObject.cpp
     Sources/Engine/GameObjects/PhysicsRectangle.cpp
     Sources/Engine/GameObjects/PhysicsRectangle.cpp
+    Sources/Game/Characters/Character.h
+    Sources/Game/Characters/Character.cpp
+    Sources/Game/Characters/Player.h
+    Sources/Game/Characters/Player.cpp
     Sources/Game/Brick.h
     Sources/Game/Brick.cpp
-    Sources/Game/Player.h
-    Sources/Game/Player.cpp
     Sources/Game/TowerTop.h
     Sources/Game/TowerTop.cpp
     Sources/Game/Game.h
