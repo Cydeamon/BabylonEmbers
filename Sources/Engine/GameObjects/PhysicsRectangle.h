@@ -2,6 +2,7 @@
 
 #include <Engine/Engine.h>
 
+
 class PhysicsRectangle : public GameObject
 {
 public: 
@@ -24,9 +25,11 @@ public:
     bool IsPointWithinBody(Vector2 point);
     void SetRotation(Vector2 rotation);
     void SetRotation(b2Rot rotation);
+    void SetVelocity(Vector2 velocity);
     float GetRotationDeg();
     Vector2 GetRotationDirection();
     b2BodyId GetBodyId() { return bodyId; }
+    b2ShapeId GetShapeId() { return shapeId; }
     Vector2 GetPosition() { return position; }
 
 protected: 

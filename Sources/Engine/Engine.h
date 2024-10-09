@@ -22,8 +22,9 @@ namespace Engine
     void Update();
     void ResortObjects();
     void SetDrawHUDCallback(std::function<void(void)> callback);
+    void SetPhysFilterCategories(b2ShapeId shapeId, uint64_t filterCategories, uint64_t filterMask = 0);
 
     // Physics
     b2WorldId GetPhysWorldID();
-    void AttachPhysShapeToBody(b2BodyId bodyId, std::vector<b2Vec2> vertices);
+    b2ShapeId AttachPhysShapeToBody(b2BodyId bodyId, std::vector<b2Vec2> vertices);
 }

@@ -1,10 +1,18 @@
 #include "Player.h"
+#include <Game/PhysicsCategory.h>
 #include <iostream>
 
 Player::Player() : Character()
 {
     spritesheetTextureIdle = LoadTexture("Assets/PlayerIdle.png");
     spritesheetTextureRunning = LoadTexture("Assets/PlayerRun.png");
+    crossbowTexture = LoadTexture("Assets/Crossbow.png");
+
+    // Setup physics filters
+    filterCategories = GamePhysicsCategories::PLAYER;
+    filterMask = 
+        GamePhysicsCategories::ENEMY | GamePhysicsCategories::GROUND | GamePhysicsCategories::TOWER_BRICK | 
+        GamePhysicsCategories::ARROW | GamePhysicsCategories::TOWER_TOP | GamePhysicsCategories::PLAYER;
 }
 
 
@@ -53,7 +61,23 @@ void Player::Update()
                 state = RUNNING;
 
             b2Body_SetLinearVelocity(physBodyId, finalVelocity);
-        }       
+        }
+
+        if (IsMouseButtonDown(0))
+            shot();
+
+
+        // Rotate weapon
+        weaponAngle = atan2(Engine::GetMousePositionScaled().y - position.y, Engine::GetMousePositionScaled().x - position.x);
+        weaponAngle *= RAD2DEG;
+
+        if (state == IDLE)
+        {
+            if (position.x - Engine::GetMousePositionScaled().x < 0)
+                lookDirection.x = 1;
+            else
+                lookDirection.x = -1;
+        }
 
         // Set animation texture
         if (state == IDLE && currentTexture != &spritesheetTextureIdle)
@@ -68,4 +92,41 @@ void Player::Update()
             frameDuration = 1.0f / 24.0f;
         }
     }
+}
+
+void Player::Draw()
+{
+    Character::Draw();
+
+    if (!dead)
+    {
+        DrawTexturePro(
+            crossbowTexture,
+            {0, 0, crossbowTexture.width, crossbowTexture.height},
+            {position.x + 10, position.y + 9, crossbowTexture.width, crossbowTexture.height},
+            {lookDirection.x > 0 ? 1 : -3, 3},
+            weaponAngle,
+            WHITE
+        );
+    }
+}
+
+void Player::shot()
+{
+    Vector2 arrowStartPos = {lookDirection.x > 0 ? position.x + 10 : position.x + 3, lookDirection.x > 0 ? position.y + 9 : position.y + 9};
+    PhysicsRectangle *arrow = new PhysicsRectangle(
+        arrowStartPos,
+        {5, 1},
+        PhysicsRectangle::BodyType::KINEMATIC
+    );
+
+    Engine::SetPhysFilterCategories(
+        arrow->GetShapeId(), 
+        GamePhysicsCategories::ARROW, 
+        GamePhysicsCategories::ENEMY | GamePhysicsCategories::TOWER_BRICK
+    );
+
+    float arrowAngle = atan2(Engine::GetMousePositionScaled().y - arrowStartPos.y, Engine::GetMousePositionScaled().x - arrowStartPos.x);
+    arrow->SetRotation(b2Rot{cos(arrowAngle), sin(arrowAngle)});
+    arrow->SetVelocity({100 * cos(arrowAngle), 100 * sin(arrowAngle)});
 }

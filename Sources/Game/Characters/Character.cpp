@@ -12,9 +12,6 @@ Character::Character()
     SetDrawPriority(LOW);
 }
 
-Character::~Character()
-{
-}
 
 void Character::Update()
 {
@@ -168,7 +165,7 @@ void Character::createRagdollBodies()
     b2Polygon headBodyCube = b2MakeBox(ragdollHeadExtent.x, ragdollHeadExtent.y);
     b2ShapeDef headShapeDef = b2DefaultShapeDef();
     headShapeDef.friction = 0.05f;
-    b2CreatePolygonShape(ragdollHeadId, &headShapeDef, &headBodyCube);
+    ragdollHeadShapeId = b2CreatePolygonShape(ragdollHeadId, &headShapeDef, &headBodyCube);
     drawPos.y += headSize.y;
 
     b2BodyDef bodyBodyDef = b2DefaultBodyDef();
@@ -178,7 +175,7 @@ void Character::createRagdollBodies()
     b2Polygon bodyBodyCube = b2MakeBox(ragdollBodyExtent.x, ragdollBodyExtent.y);
     b2ShapeDef bodyShapeDef = b2DefaultShapeDef();
     bodyShapeDef.friction = 0.05f;
-    b2CreatePolygonShape(ragdollBodyId, &bodyShapeDef, &bodyBodyCube);
+    ragdollBodyShapeId = b2CreatePolygonShape(ragdollBodyId, &bodyShapeDef, &bodyBodyCube);
     drawPos.y += bodySize.y;
 
     b2BodyDef legsBodyDef = b2DefaultBodyDef();
@@ -188,7 +185,7 @@ void Character::createRagdollBodies()
     b2Polygon legsBodyCube = b2MakeBox(ragdollLegsExtent.x, ragdollLegsExtent.y);
     b2ShapeDef legsShapeDef = b2DefaultShapeDef();
     legsShapeDef.friction = 0.05f;
-    b2CreatePolygonShape(ragdollLegsId, &legsShapeDef, &legsBodyCube);
+    ragdollLegsShapeId = b2CreatePolygonShape(ragdollLegsId, &legsShapeDef, &legsBodyCube);
 
     // Setup joints
     b2RevoluteJointDef headJointDef = b2DefaultRevoluteJointDef();
@@ -210,6 +207,11 @@ void Character::createRagdollBodies()
     bodyJointDef.upperAngle = (b2_pi);
     bodyJointDef.enableLimit = true;
     b2CreateRevoluteJoint(Engine::GetPhysWorldID(), &bodyJointDef);
+
+    // Setup physics filters
+    Engine::SetPhysFilterCategories(ragdollHeadShapeId, filterCategories, filterMask);
+    Engine::SetPhysFilterCategories(ragdollBodyShapeId, filterCategories, filterMask);
+    Engine::SetPhysFilterCategories(ragdollLegsShapeId, filterCategories, filterMask);
 
     // Apply same velocity to bodies as physBodyId
     b2Body_ApplyLinearImpulse(

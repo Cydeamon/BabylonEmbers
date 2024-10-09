@@ -3,8 +3,8 @@
 #define APP_VERSION "0.3.2"
 #define APP_NAME "Tower Defender"
 #define APP_AUTHOR "Cydeamon"
-#define BUILD_TYPE "Release"
-#define DESCRIPTION "Tower Defender 0.3.2. Release version"
+#define BUILD_TYPE "Debug"
+#define DESCRIPTION "Tower Defender 0.3.2. Debug version"
 #define IDI_ICON1 101
 
 VS_VERSION_INFO VERSIONINFO

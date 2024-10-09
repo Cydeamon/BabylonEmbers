@@ -79,6 +79,11 @@ void PhysicsRectangle::SetRotation(b2Rot rotation)
     b2Body_SetTransform(bodyId, {position.x, position.y}, rotation);
 }
 
+void PhysicsRectangle::SetVelocity(Vector2 velocity)
+{
+    b2Body_SetLinearVelocity(bodyId, {velocity.x, velocity.y});
+}
+
 float PhysicsRectangle::GetRotationDeg()
 {
     b2Rot rotation = b2Body_GetRotation(bodyId);

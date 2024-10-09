@@ -1,12 +1,20 @@
 #include "Brick.h"
 #include <iostream>
 #include <Engine/Engine.h>
+#include <Game/PhysicsCategory.h>
 
 Brick::Brick(Vector2 position, Vector2 size, float gap) : PhysicsRectangle(position, size, DYNAMIC)
 {
     SetDensity(2);
     SetFriction(0);
     SetPadding(gap);
+    Engine::SetPhysFilterCategories(
+        shapeId,
+        GamePhysicsCategories::TOWER_BRICK,
+        GamePhysicsCategories::DEBRIS | GamePhysicsCategories::TOWER_TOP | GamePhysicsCategories::PLAYER | GamePhysicsCategories::ENEMY | GamePhysicsCategories::ARROW |
+        GamePhysicsCategories::GROUND | GamePhysicsCategories::TOWER_BRICK 
+        
+    );
 }
 
 Brick::~Brick()
@@ -52,6 +60,12 @@ void Brick::destroy()
 
             piece->SetDensity(100);
             piece->SetColor(BLACK);
+
+            Engine::SetPhysFilterCategories(
+                piece->GetShapeId(),
+                GamePhysicsCategories::DEBRIS,
+                GamePhysicsCategories::DEBRIS | GamePhysicsCategories::TOWER_TOP | GamePhysicsCategories::TOWER_BRICK | GamePhysicsCategories::GROUND
+            );
             b2Body_ApplyLinearImpulse(piece->GetBodyId(), {forceX, forceY}, b2Body_GetWorldCenterOfMass(piece->GetBodyId()), true);
         }
     }            

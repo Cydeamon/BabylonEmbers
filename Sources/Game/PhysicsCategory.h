@@ -1,0 +1,15 @@
+#ifndef GAMEPHYSICSCATEGORY_H
+#define GAMEPHYSICSCATEGORY_H
+
+enum GamePhysicsCategories
+{
+    PLAYER 		= 0b0000001,
+    ENEMY  		= 0b0000010,
+    GROUND 		= 0b0000100,
+    TOWER_BRICK = 0b0001000,
+    ARROW 		= 0b0010000,
+    TOWER_TOP 	= 0b0100000,
+    DEBRIS      = 0b1000000
+};
+
+#endif

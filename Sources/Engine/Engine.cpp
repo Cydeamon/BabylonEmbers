@@ -203,12 +203,23 @@ namespace Engine
         Engine::DrawHUDCallback = callback;
     }
 
+    void SetPhysFilterCategories(b2ShapeId shapeId, uint64_t filterCategories, uint64_t filterMask)
+    {                
+        b2Filter filter = b2Shape_GetFilter(shapeId);
+        filter.categoryBits = filterCategories;
+
+        if (filterMask != 0)
+            filter.maskBits = filterMask;
+        
+        b2Shape_SetFilter(shapeId, filter);
+    }
+
     b2WorldId GetPhysWorldID()
     {
         return physWorldId;
     }
     
-    void AttachPhysShapeToBody(b2BodyId bodyId, std::vector<b2Vec2> vertices)
+    b2ShapeId AttachPhysShapeToBody(b2BodyId bodyId, std::vector<b2Vec2> vertices)
     {        
         b2Vec2 verticesArr[vertices.size()];
 
@@ -221,6 +232,6 @@ namespace Engine
         shapeDef.density = 1.5;
         shapeDef.friction = 5;
 
-        b2CreatePolygonShape( bodyId, &shapeDef, &shape );
+        return b2CreatePolygonShape( bodyId, &shapeDef, &shape );
     }
 }

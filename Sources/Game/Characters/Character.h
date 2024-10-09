@@ -6,7 +6,6 @@ class Character : public GameObject
 {
 public:
     Character();
-    ~Character();
     void Update() override;
     void Draw() override;
     bool IsDead() { return dead; }
@@ -40,11 +39,16 @@ protected:
 
     // Ragdoll parts
     b2BodyId ragdollHeadId;
+    b2ShapeId ragdollHeadShapeId;
     b2Vec2 ragdollHeadExtent = {0};
     b2BodyId ragdollBodyId;
+    b2ShapeId ragdollBodyShapeId;
     b2Vec2 ragdollBodyExtent = {0};
     b2BodyId ragdollLegsId;
+    b2ShapeId ragdollLegsShapeId;
     b2Vec2 ragdollLegsExtent = {0};
+    uint64_t filterCategories = 0;
+    uint64_t filterMask = 0;
     
     void initPhysicsBody();
     void die();

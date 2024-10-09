@@ -1,6 +1,7 @@
 #include "Game.h"
 #include <stdlib.h>
 #include <iostream>
+#include "PhysicsCategory.h"
 
 Game::Game()
 {
@@ -36,7 +37,16 @@ void Game::prepareScene()
         PhysicsRectangle::BodyType::STATIC
     );
 
+    Engine::SetPhysFilterCategories(
+        floor->GetShapeId(),
+        GamePhysicsCategories::GROUND,
+        GamePhysicsCategories::ENEMY | GamePhysicsCategories::TOWER_TOP | GamePhysicsCategories::TOWER_BRICK | 
+        GamePhysicsCategories::PLAYER | GamePhysicsCategories::ARROW | GamePhysicsCategories::DEBRIS
+    );
+
     generateTower();
+    player = new Player();
+    player->SetPosition({100, 100});
 
     floor->SetDensity(0);
     floor->SetFriction(1);
@@ -69,11 +79,11 @@ void Game::generateTower()
         towerTopRowY - towerTop->GetSize().y - gapBetweenBricksInPX
     });
 
-    player = new Player();
-    player->SetPosition({
-        (Engine::GetInternalResolution().x / 2) - (player->GetSize().x / 2), 
-        towerTopRowY - player->GetSize().y - 10.0f
-    });
+    // player = new Player();
+    // player->SetPosition({
+    //     (Engine::GetInternalResolution().x / 2) - (player->GetSize().x / 2), 
+    //     towerTopRowY - player->GetSize().y - 10.0f
+    // });
 }
 
 void Game::showEndGameScreen()
@@ -85,6 +95,6 @@ void Game::showEndGameScreen()
 
 void Game::drawUI()
 {
-    if (player->IsDead())
+    if (player && player->IsDead())
         showEndGameScreen();
 }
