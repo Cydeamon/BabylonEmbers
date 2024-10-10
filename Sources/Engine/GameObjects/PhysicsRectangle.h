@@ -13,8 +13,6 @@ public:
     void Draw() override;
     void Update() override;
 
-    void Enable()  { /* TODO: !!! */ }
-    void Disable() { /* TODO: !!! */ }
     void SetColor(Color color) { this->color = color; }
     void SetOutlineColor(Color color) { this->outlineColor = color; }
     void SetOutlineThickness(int thickness) { this->outlineThickness = thickness; }
@@ -26,6 +24,7 @@ public:
     void SetRotation(Vector2 rotation);
     void SetRotation(b2Rot rotation);
     void SetVelocity(Vector2 velocity);
+    b2ShapeDef* GetShapeDef() { return &shapeDef; }
     float GetRotationDeg();
     Vector2 GetRotationDirection();
     b2BodyId GetBodyId() { return bodyId; }

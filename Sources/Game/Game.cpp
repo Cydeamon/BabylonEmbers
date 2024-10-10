@@ -19,7 +19,6 @@ void Game::Run()
     {   
         // Update 
         Engine::Update();
-
         
         // Draw
         Engine::Draw();
@@ -37,6 +36,8 @@ void Game::prepareScene()
         PhysicsRectangle::BodyType::STATIC
     );
 
+    b2Shape_SetUserData(floor->GetShapeId(), floor);
+
     Engine::SetPhysFilterCategories(
         floor->GetShapeId(),
         GamePhysicsCategories::GROUND,
@@ -45,11 +46,9 @@ void Game::prepareScene()
     );
 
     generateTower();
-    player = new Player();
-    player->SetPosition({100, 100});
 
-    floor->SetDensity(0);
-    floor->SetFriction(1);
+    b2Shape_SetDensity(floor->GetShapeId(), 0);
+    b2Shape_SetFriction(floor->GetShapeId(), 1);
 }
 
 void Game::generateTower()
@@ -79,11 +78,11 @@ void Game::generateTower()
         towerTopRowY - towerTop->GetSize().y - gapBetweenBricksInPX
     });
 
-    // player = new Player();
-    // player->SetPosition({
-    //     (Engine::GetInternalResolution().x / 2) - (player->GetSize().x / 2), 
-    //     towerTopRowY - player->GetSize().y - 10.0f
-    // });
+    player = new Player();
+    player->SetPosition({
+        (Engine::GetInternalResolution().x / 2) - (player->GetSize().x / 2), 
+        towerTopRowY - player->GetSize().y - 10.0f
+    });
 }
 
 void Game::showEndGameScreen()

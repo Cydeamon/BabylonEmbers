@@ -164,6 +164,7 @@ void Character::createRagdollBodies()
     ragdollHeadId = b2CreateBody(Engine::GetPhysWorldID(), &headBodyDef);
     b2Polygon headBodyCube = b2MakeBox(ragdollHeadExtent.x, ragdollHeadExtent.y);
     b2ShapeDef headShapeDef = b2DefaultShapeDef();
+    headShapeDef.userData = this;
     headShapeDef.friction = 0.05f;
     ragdollHeadShapeId = b2CreatePolygonShape(ragdollHeadId, &headShapeDef, &headBodyCube);
     drawPos.y += headSize.y;
@@ -174,6 +175,7 @@ void Character::createRagdollBodies()
     ragdollBodyId = b2CreateBody(Engine::GetPhysWorldID(), &bodyBodyDef);
     b2Polygon bodyBodyCube = b2MakeBox(ragdollBodyExtent.x, ragdollBodyExtent.y);
     b2ShapeDef bodyShapeDef = b2DefaultShapeDef();
+    bodyShapeDef.userData = this;
     bodyShapeDef.friction = 0.05f;
     ragdollBodyShapeId = b2CreatePolygonShape(ragdollBodyId, &bodyShapeDef, &bodyBodyCube);
     drawPos.y += bodySize.y;
@@ -184,6 +186,7 @@ void Character::createRagdollBodies()
     ragdollLegsId = b2CreateBody(Engine::GetPhysWorldID(), &legsBodyDef);
     b2Polygon legsBodyCube = b2MakeBox(ragdollLegsExtent.x, ragdollLegsExtent.y);
     b2ShapeDef legsShapeDef = b2DefaultShapeDef();
+    legsShapeDef.userData = this;
     legsShapeDef.friction = 0.05f;
     ragdollLegsShapeId = b2CreatePolygonShape(ragdollLegsId, &legsShapeDef, &legsBodyCube);
 

@@ -21,6 +21,8 @@ private:
     PlayerState state = IDLE;
     float weaponAngle = 0;
     Vector2 weaponPosition = {9, 5};
+    float weaponCooldownTime = 0.5f;
+    float lastShotTime = 0;
 
     void shot();
 };

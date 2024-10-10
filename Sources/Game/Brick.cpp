@@ -5,21 +5,23 @@
 
 Brick::Brick(Vector2 position, Vector2 size, float gap) : PhysicsRectangle(position, size, DYNAMIC)
 {
-    SetDensity(2);
-    SetFriction(0);
+    b2Shape_SetDensity(shapeId, 2000);
+    b2Shape_SetFriction(shapeId, 0);
     SetPadding(gap);
     Engine::SetPhysFilterCategories(
         shapeId,
         GamePhysicsCategories::TOWER_BRICK,
         GamePhysicsCategories::DEBRIS | GamePhysicsCategories::TOWER_TOP | GamePhysicsCategories::PLAYER | GamePhysicsCategories::ENEMY | GamePhysicsCategories::ARROW |
         GamePhysicsCategories::GROUND | GamePhysicsCategories::TOWER_BRICK 
-        
     );
+
+    b2Shape_SetUserData(shapeId, this);
 }
 
 Brick::~Brick()
 {
 }
+
 
 void Brick::Update() 
 {
@@ -30,12 +32,12 @@ void Brick::Update()
         if (Engine::IsDebug())
         {
             if (IsPointWithinBody(Engine::GetMousePositionScaled()))
-                destroy();
+                Destroy();
         }
     }
 }
 
-void Brick::destroy()
+void Brick::Destroy()
 {
     int pieceSize = (rand() % 2) + 1;
     int piecesX;
@@ -58,8 +60,9 @@ void Brick::destroy()
             float forceX = (rand() % maxForce * 2) - maxForce;
             float forceY = (rand() % maxForce * 2) - maxForce;
 
-            piece->SetDensity(100);
+            b2Shape_SetDensity(piece->GetShapeId(), 100);
             piece->SetColor(BLACK);
+            b2Shape_SetUserData(piece->GetShapeId(), piece);
 
             Engine::SetPhysFilterCategories(
                 piece->GetShapeId(),
@@ -71,4 +74,12 @@ void Brick::destroy()
     }            
 
     QueueDestroy();
+}
+
+void Brick::Damage()
+{
+    health--;
+
+    if (health <= 0)
+        Destroy();
 }

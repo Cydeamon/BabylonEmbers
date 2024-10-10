@@ -219,19 +219,4 @@ namespace Engine
         return physWorldId;
     }
     
-    b2ShapeId AttachPhysShapeToBody(b2BodyId bodyId, std::vector<b2Vec2> vertices)
-    {        
-        b2Vec2 verticesArr[vertices.size()];
-
-        for (int i = 0; i < vertices.size(); i++)
-            verticesArr[i] = vertices[i];
-
-        b2Hull hull = b2ComputeHull( verticesArr, vertices.size() );
-        b2Polygon shape = b2MakePolygon( &hull, 0.15f);
-        b2ShapeDef shapeDef = b2DefaultShapeDef();
-        shapeDef.density = 1.5;
-        shapeDef.friction = 5;
-
-        return b2CreatePolygonShape( bodyId, &shapeDef, &shape );
-    }
 }

@@ -26,5 +26,4 @@ namespace Engine
 
     // Physics
     b2WorldId GetPhysWorldID();
-    b2ShapeId AttachPhysShapeToBody(b2BodyId bodyId, std::vector<b2Vec2> vertices);
 }

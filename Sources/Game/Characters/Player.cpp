@@ -1,5 +1,6 @@
 #include "Player.h"
 #include <Game/PhysicsCategory.h>
+#include <Game/Arrow.h>
 #include <iostream>
 
 Player::Player() : Character()
@@ -7,12 +8,13 @@ Player::Player() : Character()
     spritesheetTextureIdle = LoadTexture("Assets/PlayerIdle.png");
     spritesheetTextureRunning = LoadTexture("Assets/PlayerRun.png");
     crossbowTexture = LoadTexture("Assets/Crossbow.png");
-
+    
     // Setup physics filters
     filterCategories = GamePhysicsCategories::PLAYER;
     filterMask = 
         GamePhysicsCategories::ENEMY | GamePhysicsCategories::GROUND | GamePhysicsCategories::TOWER_BRICK | 
         GamePhysicsCategories::ARROW | GamePhysicsCategories::TOWER_TOP | GamePhysicsCategories::PLAYER;
+
 }
 
 
@@ -32,7 +34,7 @@ void Player::Update()
             return;
         }
 
-        // Apply controls
+        // Apply controls if on ground
         int capacity = b2Body_GetContactCapacity(physBodyId);
 
         if (capacity)
@@ -64,7 +66,13 @@ void Player::Update()
         }
 
         if (IsMouseButtonDown(0))
-            shot();
+        {
+            if (GetTime() - lastShotTime > weaponCooldownTime)
+            {
+                shot();
+                lastShotTime = GetTime();
+            }
+        }
 
 
         // Rotate weapon
@@ -114,19 +122,5 @@ void Player::Draw()
 void Player::shot()
 {
     Vector2 arrowStartPos = {lookDirection.x > 0 ? position.x + 10 : position.x + 3, lookDirection.x > 0 ? position.y + 9 : position.y + 9};
-    PhysicsRectangle *arrow = new PhysicsRectangle(
-        arrowStartPos,
-        {5, 1},
-        PhysicsRectangle::BodyType::KINEMATIC
-    );
-
-    Engine::SetPhysFilterCategories(
-        arrow->GetShapeId(), 
-        GamePhysicsCategories::ARROW, 
-        GamePhysicsCategories::ENEMY | GamePhysicsCategories::TOWER_BRICK
-    );
-
-    float arrowAngle = atan2(Engine::GetMousePositionScaled().y - arrowStartPos.y, Engine::GetMousePositionScaled().x - arrowStartPos.x);
-    arrow->SetRotation(b2Rot{cos(arrowAngle), sin(arrowAngle)});
-    arrow->SetVelocity({100 * cos(arrowAngle), 100 * sin(arrowAngle)});
+    new Arrow(arrowStartPos);
 }
