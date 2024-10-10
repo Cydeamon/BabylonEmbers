@@ -37,6 +37,9 @@ protected:
     int curTextureCols;
     b2Vec2 moveDirection = {0};
     b2Vec2 lookDirection = {1, 0};
+    int bloodParticlesLeft;
+    double bleedInterval = 1.0f / 12.0f;
+    double lastBleedTime = 0;
 
     // Ragdoll parts
     b2BodyId ragdollHeadId;
@@ -53,4 +56,5 @@ protected:
     
     void initPhysicsBody();
     void createRagdollBodies();
+    void dropBloodParticle();
 };

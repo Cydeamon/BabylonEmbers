@@ -1,5 +1,7 @@
 #include "Character.h"
 #include <iostream>
+#include <Engine/GameObjects/PhysicsRectangle.h>
+#include <Game/PhysicsCategory.h>
 
 Character::Character()
 {
@@ -10,6 +12,7 @@ Character::Character()
 
     initPhysicsBody();
     SetDrawPriority(LOW);
+    bloodParticlesLeft = rand() % 30 + 30;
 }
 
 
@@ -41,6 +44,12 @@ void Character::Update()
         // Get box2d result value
         b2Vec2 pos = b2Body_GetWorldPoint(physBodyId, { -extent.x, -extent.y });
         position = {pos.x, pos.y};
+    }
+    else
+    {
+        if (bloodParticlesLeft > 0 && GetTime() - lastBleedTime > bleedInterval)
+            dropBloodParticle();
+            
     }
 }
 
@@ -85,9 +94,9 @@ void Character::Draw()
         float bodyAngle = RAD2DEG * b2Rot_GetAngle(b2Body_GetRotation(ragdollBodyId));
         float legsAngle = RAD2DEG * b2Rot_GetAngle(b2Body_GetRotation(ragdollLegsId));
 
-        DrawTextureEx(ragdollHeadTexture, {headPos.x, headPos.y}, headAngle, 1, WHITE);
-        DrawTextureEx(ragdollBodyTexture, {bodyPos.x, bodyPos.y}, bodyAngle, 1, WHITE);
-        DrawTextureEx(ragdollLegsTexture, {legsPos.x, legsPos.y}, legsAngle, 1, WHITE);
+        DrawTexturePro(ragdollHeadTexture, {0, 0, (lookDirection.x < 0 ? -1 : 1) * ragdollHeadTexture.width, ragdollHeadTexture.height}, {headPos.x, headPos.y, ragdollHeadTexture.width, ragdollHeadTexture.height}, {0}, headAngle, WHITE);
+        DrawTexturePro(ragdollBodyTexture, {0, 0, (lookDirection.x < 0 ? -1 : 1) * ragdollBodyTexture.width, ragdollBodyTexture.height}, {bodyPos.x, bodyPos.y, ragdollBodyTexture.width, ragdollBodyTexture.height}, {0}, bodyAngle, WHITE);
+        DrawTexturePro(ragdollLegsTexture, {0, 0, (lookDirection.x < 0 ? -1 : 1) * ragdollLegsTexture.width, ragdollLegsTexture.height}, {legsPos.x, legsPos.y, ragdollLegsTexture.width, ragdollLegsTexture.height}, {0}, legsAngle, WHITE);
     }
 }
 
@@ -210,4 +219,25 @@ void Character::createRagdollBodies()
     b2Body_ApplyLinearImpulseToCenter(ragdollBodyId, b2Body_GetLinearVelocity(physBodyId), true);
     b2Body_ApplyLinearImpulseToCenter(ragdollLegsId, b2Body_GetLinearVelocity(physBodyId), true);
     b2Body_ApplyLinearImpulseToCenter(ragdollHeadId, b2Body_GetLinearVelocity(physBodyId), true);
+}
+
+void Character::dropBloodParticle()
+{
+    b2Vec2 pos = b2Body_GetPosition(ragdollBodyId);
+
+    PhysicsRectangle *piece = new PhysicsRectangle(
+        {pos.x, pos.y},
+        {1, 1}, 
+        PhysicsRectangle::BodyType::DYNAMIC
+    );
+
+    b2Vec2 force = {(lookDirection.x < 0 ? 1 : -1) *(rand() % 25 - 50), rand() % 2 - 4};
+    force = b2RotateVector(b2Body_GetRotation(ragdollBodyId), force);
+    piece->SetColor(BLACK);
+
+    Engine::SetPhysFilterCategories(piece->GetShapeId(), 0, 0);
+    b2Body_ApplyLinearImpulseToCenter(piece->GetBodyId(), force, true);
+    bloodParticlesLeft--;
+    bleedInterval = 1.0 / (rand() % 1 + 23);
+    lastBleedTime = GetTime();
 }
