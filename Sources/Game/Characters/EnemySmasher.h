@@ -1,19 +1,26 @@
 #pragma once
 
 #include <Engine/Engine.h>
-#include "Character.h"
+#include "Game/Brick.h"
+#include "Enemy.h"
 
-class Player : public Character
+class EnemySmasher : public Enemy
 {
 public:
-    Player();
+    EnemySmasher();
     void Update() override;
 
-    enum PlayerState { IDLE, RUNNING };
+    enum EnemySmasherState { RUNNING, ATTACK };
 
 private:
-    Texture2D spritesheetTextureIdle;
+    Texture2D spritesheetTextureAttack;
     Texture2D spritesheetTextureRunning;
-    PlayerState state = IDLE;
+    EnemySmasherState state = RUNNING;
+    Brick* targetBrick = nullptr;
+    bool wasAttacked = false;
+    double waitTimeAfterDestroy = 1;
+    double waitTimeStart = -1000;
+
+    void processCollisions();
 
 };

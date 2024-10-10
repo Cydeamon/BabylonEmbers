@@ -30,7 +30,7 @@ void Player::Update()
         if (position.x + size.x < 0 || position.x - size.x > Engine::GetInternalResolution().x || 
             position.y + size.y < 0 || position.y - size.y > Engine::GetInternalResolution().y)
         {
-            die();
+            Die();
             return;
         }
 

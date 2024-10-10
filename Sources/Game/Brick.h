@@ -10,6 +10,7 @@ public:
     void Update() override;
     void Destroy();
     void Damage();
+    int GetHealth() { return health; }
     
 private: 
     int health = 3;    

@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <iostream>
 #include "PhysicsCategory.h"
+#include "Characters/EnemySmasher.h"
 
 Game::Game()
 {
     Engine::Init({1600, 900}, {480, 270});
-    floorY = Engine::GetInternalResolution().y - floorHeight;
     font = LoadFont("Assets/Fonts/PressStart2P-Regular.ttf");
     Engine::SetDrawHUDCallback(std::bind(&Game::drawUI, this));
 }
@@ -14,6 +14,7 @@ Game::Game()
 void Game::Run()
 {
     prepareScene();
+    EnemySmasher enemySmasher;
 
     while (Engine::IsRunning())
     {   
@@ -31,8 +32,8 @@ void Game::Run()
 void Game::prepareScene()
 {
     PhysicsRectangle *floor = new PhysicsRectangle(
-        {0, (float) floorY}, 
-        {1000, (float) floorHeight}, 
+        {0, (float) FloorY}, 
+        {1000, (float) FloorHeight}, 
         PhysicsRectangle::BodyType::STATIC
     );
 
@@ -59,7 +60,7 @@ void Game::generateTower()
     {
         int widthLeft = firstBricksLineWidthInPX - (sidesOffsetPerLine * 2 * curRow);
         float x = Engine::GetInternalResolution().x / 2 - (widthLeft / 2);
-        float y = floorY - brickHeightInPX - gapBetweenBricksInPX - (curRow * brickHeightInPX) - (gapBetweenBricksInPX * curRow);
+        float y = FloorY - brickHeightInPX - gapBetweenBricksInPX - (curRow * brickHeightInPX) - (gapBetweenBricksInPX * curRow);
         towerTopRowY = (int) y;
 
         while (widthLeft > 0)

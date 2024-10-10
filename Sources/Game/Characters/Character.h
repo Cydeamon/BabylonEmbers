@@ -13,6 +13,7 @@ public:
     Vector2 GetSize() { return size; }
     void SetPosition(Vector2 pos) override;
     void SetAnimationTexture(Texture2D *texture);
+    void Die();
 
 protected:
     Texture2D ragdollHeadTexture;
@@ -51,6 +52,5 @@ protected:
     uint64_t filterMask = 0;
     
     void initPhysicsBody();
-    void die();
     void createRagdollBodies();
 };

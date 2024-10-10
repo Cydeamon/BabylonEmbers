@@ -38,19 +38,6 @@ void Character::Update()
             }
         }
 
-        // Kill character on click in debug mode
-        if (Engine::IsDebug())
-        {
-            if (IsMouseButtonPressed(0))
-            {
-                if (b2Shape_TestPoint(physShapeId, {Engine::GetMousePositionScaled().x, Engine::GetMousePositionScaled().y}))
-                {
-                    die();
-                    return;
-                }
-            }
-        }
-
         // Get box2d result value
         b2Vec2 pos = b2Body_GetWorldPoint(physBodyId, { -extent.x, -extent.y });
         position = {pos.x, pos.y};
@@ -140,11 +127,14 @@ void Character::initPhysicsBody()
 }
 
 
-void Character::die()
+void Character::Die()
 {
-    dead = true;
-    createRagdollBodies();
-    b2DestroyBody(physBodyId);
+    if (!dead)
+    {
+        dead = true;
+        createRagdollBodies();
+        b2DestroyBody(physBodyId);
+    }
 }
 
 void Character::createRagdollBodies()
@@ -217,10 +207,7 @@ void Character::createRagdollBodies()
     Engine::SetPhysFilterCategories(ragdollLegsShapeId, filterCategories, filterMask);
 
     // Apply same velocity to bodies as physBodyId
-    b2Body_ApplyLinearImpulse(
-        ragdollBodyId, 
-        b2Body_GetLinearVelocity(physBodyId),
-        b2Body_GetLocalCenterOfMass(ragdollBodyId), 
-        true
-    );
+    b2Body_ApplyLinearImpulseToCenter(ragdollBodyId, b2Body_GetLinearVelocity(physBodyId), true);
+    b2Body_ApplyLinearImpulseToCenter(ragdollLegsId, b2Body_GetLinearVelocity(physBodyId), true);
+    b2Body_ApplyLinearImpulseToCenter(ragdollHeadId, b2Body_GetLinearVelocity(physBodyId), true);
 }

@@ -1,71 +1,107 @@
-#include "Player.h"
+#include "EnemySmasher.h"
 #include <iostream>
+#include <Game/PhysicsCategory.h>
+#include <Game/Game.h>
 
-Player::Player() : Character()
+EnemySmasher::EnemySmasher() : Enemy()
 {
-    spritesheetTextureIdle = LoadTexture("Assets/PlayerIdle.png");
-    spritesheetTextureRunning = LoadTexture("Assets/PlayerRun.png");
+    spritesheetTextureAttack = LoadTexture("Assets/EnemySmasherAttack.png");
+    spritesheetTextureRunning = LoadTexture("Assets/EnemySmasherRun.png");
+    b2Shape_SetUserData(physShapeId, this);
+
+    // Set initial position outside of the screen on random side
+    bool left = rand() % 2 == 0;
+    float x = (left ? +50 : Engine::GetInternalResolution().x - 50);
+    SetPosition({x, Game::FloorY - (size.y / 2)});
+
+    // Set initial velocity
+    moveDirection = {left ? 1 : -1, 0};    
+    lookDirection = {moveDirection.x, moveDirection.y};
+
 }
 
 
-void Player::Update()
+
+void EnemySmasher::Update()
 {
-    Character::Update();    
-    
+    Enemy::Update();
+
     if (!dead)
-    {        
-        moveDirection = {0};
-
-        // Kill player if out of bounds
-        if (position.x + size.x < 0 || position.x - size.x > Engine::GetInternalResolution().x || 
-            position.y + size.y < 0 || position.y - size.y > Engine::GetInternalResolution().y)
-        {
-            die();
-            return;
-        }
-
-        // Apply controls
-        int capacity = b2Body_GetContactCapacity(physBodyId);
-
-        if (capacity)
-        {
-            b2Vec2 finalVelocity = b2Body_GetLinearVelocity(physBodyId);
-
-            if (IsKeyDown(KEY_LEFT))
-            {
-                moveDirection.x = -1;
-                lookDirection.x = -1;
-            }
-            else if (IsKeyDown(KEY_RIGHT))
-            {
-                moveDirection.x += 1;
-                lookDirection.x = 1;
-            }
-            else
-                state = IDLE;
-
-            if (finalVelocity.x > -speed && moveDirection.x < 0)
-                finalVelocity.x = moveDirection.x * speed;
-            else if (finalVelocity.x < speed && moveDirection.x > 0)
-                finalVelocity.x = moveDirection.x * speed;
-
-            if (moveDirection.x != 0 && (finalVelocity.x < 0 || finalVelocity.x > 0))
-                state = RUNNING;
-
-            b2Body_SetLinearVelocity(physBodyId, finalVelocity);
-        }       
+    {
+        processCollisions();
 
         // Set animation texture
-        if (state == IDLE && currentTexture != &spritesheetTextureIdle)
-        {
-            SetAnimationTexture(&spritesheetTextureIdle);
-            frameDuration = 1.0f / 12.0f;
-        }
+        if (state == ATTACK && currentTexture != &spritesheetTextureAttack)
+            SetAnimationTexture(&spritesheetTextureAttack);
 
         if (state == RUNNING && currentTexture != &spritesheetTextureRunning)
-        {
             SetAnimationTexture(&spritesheetTextureRunning);
-            frameDuration = 1.0f / 24.0f;
+
+        if (GetTime() - waitTimeStart > waitTimeAfterDestroy)
+        {
+            lookDirection = {moveDirection.x, moveDirection.y};
+            // Move in direction
+            if (state == RUNNING)    
+                b2Body_SetLinearVelocity(physBodyId, {moveDirection.x * 50, moveDirection.y});
+
+            // If attacking, apply damage to the brick
+            if (state == ATTACK)
+            {
+                if (curFrame == 0)
+                    wasAttacked = false;
+
+                if (curFrame == 8 && !wasAttacked && targetBrick)
+                {
+                    targetBrick->Damage();
+                    wasAttacked = true;
+
+                    if (!targetBrick->GetHealth())
+                    {
+                        state = RUNNING;
+                        targetBrick = nullptr;
+                        waitTimeStart = GetTime();
+                    }
+                }
+            }
+        }
+        else
+        {
+            b2Body_SetLinearVelocity(physBodyId, {-moveDirection.x * 50, moveDirection.y});
+            lookDirection = {-moveDirection.x, moveDirection.y};
+        }
+    }
+}
+
+void EnemySmasher::processCollisions()
+{
+    if (GetTime() - waitTimeStart > waitTimeAfterDestroy)
+    {
+        int bodyContactCapacity = b2Body_GetContactCapacity(physBodyId);
+        b2ContactData contactData[bodyContactCapacity];
+        int bodyContactCount = b2Body_GetContactData(physBodyId, contactData, bodyContactCapacity);
+
+        for (int i = 0; i < bodyContactCapacity && i < bodyContactCount; i++)
+        {
+            b2ContactData* data = contactData + i;
+            void* contacts[2];
+            contacts[0] = b2Shape_GetUserData(data->shapeIdA);
+            contacts[1] = b2Shape_GetUserData(data->shapeIdB);
+
+            for (int j = 0; j < 2; j++)
+            {
+                if (contacts[j])
+                {
+                    GameObject* other = (GameObject*) contacts[j];
+                    Brick* otherBrick = dynamic_cast<Brick*>(other);
+                    
+                    if (otherBrick && state == EnemySmasherState::RUNNING)
+                    {
+                        state = EnemySmasherState::ATTACK;
+                        targetBrick = otherBrick;
+                        b2Body_SetLinearVelocity(physBodyId, {0, 0});
+                    }
+                }
+            }        
         }
     }
 }

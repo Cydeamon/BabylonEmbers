@@ -18,23 +18,9 @@ Brick::Brick(Vector2 position, Vector2 size, float gap) : PhysicsRectangle(posit
     b2Shape_SetUserData(shapeId, this);
 }
 
-Brick::~Brick()
-{
-}
-
-
 void Brick::Update() 
 {
     PhysicsRectangle::Update();
-
-    if (IsMouseButtonPressed(0))
-    {
-        if (Engine::IsDebug())
-        {
-            if (IsPointWithinBody(Engine::GetMousePositionScaled()))
-                Destroy();
-        }
-    }
 }
 
 void Brick::Destroy()

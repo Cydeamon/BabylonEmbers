@@ -43,6 +43,10 @@ add_executable(
     Sources/Game/Characters/Character.cpp
     Sources/Game/Characters/Player.h
     Sources/Game/Characters/Player.cpp
+    Sources/Game/Characters/Enemy.h
+    Sources/Game/Characters/Enemy.cpp
+    Sources/Game/Characters/EnemySmasher.h
+    Sources/Game/Characters/EnemySmasher.cpp
     Sources/Game/Brick.h
     Sources/Game/Brick.cpp
     Sources/Game/Arrow.h

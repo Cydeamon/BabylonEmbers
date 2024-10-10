@@ -4,6 +4,7 @@
 #include <Engine/Engine.h>
 #include <Game/PhysicsCategory.h>
 #include "Brick.h"
+#include "Characters/Enemy.h"
 
 Arrow::Arrow(Vector2 initPosition, Vector2 size) : PhysicsRectangle(initPosition, size, DYNAMIC)
 {
@@ -45,10 +46,14 @@ void Arrow::processCollisions()
             if (contacts[j])
             {
                 GameObject* other = (GameObject*) contacts[j];
-                Brick* otherBrick = dynamic_cast<Brick*>(other);
+                Brick* brick = dynamic_cast<Brick*>(other);
+                Enemy* enemy = dynamic_cast<Enemy*>(other);
                 
-                if (otherBrick)
+                if (brick)
                     QueueDestroy();
+
+                if (enemy)
+                    enemy->Die();
             }
         }        
     }
