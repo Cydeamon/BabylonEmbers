@@ -7,13 +7,21 @@ Enemy::Enemy() : Character()
 {
     // Setup physics filters
     filterCategories = GamePhysicsCategories::ENEMY;
-    filterMask = 
-        GamePhysicsCategories::ENEMY | GamePhysicsCategories::GROUND | GamePhysicsCategories::TOWER_BRICK | 
-        GamePhysicsCategories::ARROW | GamePhysicsCategories::TOWER_TOP | GamePhysicsCategories::PLAYER;
+    filterMask = ENEMY | GROUND | TOWER_BRICK | ARROW | TOWER_TOP | PLAYER;
 
     Engine::SetPhysFilterCategories(
         physShapeId,
         filterCategories,
         filterMask
     );
+
+    // Set initial position outside of the screen on random side
+    bool left = rand() % 2 == 0;
+    float x = (left ? 0 : Engine::GetInternalResolution().x);
+    SetPosition({x, Game::FloorY - (size.y / 2)});
+    
+    // Set initial velocity
+    moveDirection = {left ? 1 : -1, 0};    
+    lookDirection = {moveDirection.x, moveDirection.y};
+
 }

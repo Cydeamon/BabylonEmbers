@@ -214,6 +214,24 @@ namespace Engine
         b2Shape_SetFilter(shapeId, filter);
     }
 
+    std::map<GameObject *, Vector2> GetObjectsInRadius(float radius, Vector2 center)
+    {
+        std::map<GameObject *, Vector2> objects;
+
+        for (int i = 0; i < gameObjects.size(); i++)
+        {
+            if (gameObjects[i]->GetPosition().x >= center.x - radius && gameObjects[i]->GetPosition().x <= center.x + radius
+                && gameObjects[i]->GetPosition().y >= center.y - radius && gameObjects[i]->GetPosition().y <= center.y + radius)
+            {
+                objects[gameObjects[i]] = gameObjects[i]->GetPosition();
+                objects[gameObjects[i]].x -= center.x;
+                objects[gameObjects[i]].y -= center.y;
+            }
+        }
+
+        return objects;
+    }
+
     b2WorldId GetPhysWorldID()
     {
         return physWorldId;

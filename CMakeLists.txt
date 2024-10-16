@@ -47,10 +47,14 @@ add_executable(
     Sources/Game/Characters/Enemy.cpp
     Sources/Game/Characters/EnemySmasher.h
     Sources/Game/Characters/EnemySmasher.cpp
+    Sources/Game/Characters/EnemyBomber.h
+    Sources/Game/Characters/EnemyBomber.cpp
+    Sources/Game/Projectiles/Arrow.h
+    Sources/Game/Projectiles/Arrow.cpp
+    Sources/Game/Projectiles/Bomb.h
+    Sources/Game/Projectiles/Bomb.cpp
     Sources/Game/Brick.h
     Sources/Game/Brick.cpp
-    Sources/Game/Arrow.h
-    Sources/Game/Arrow.cpp
     Sources/Game/TowerTop.h
     Sources/Game/TowerTop.cpp
     Sources/Game/Game.h

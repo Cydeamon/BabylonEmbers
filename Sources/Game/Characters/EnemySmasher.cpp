@@ -8,16 +8,6 @@ EnemySmasher::EnemySmasher() : Enemy()
     spritesheetTextureAttack = LoadTexture("Assets/EnemySmasherAttack.png");
     spritesheetTextureRunning = LoadTexture("Assets/EnemySmasherRun.png");
     b2Shape_SetUserData(physShapeId, this);
-
-    // Set initial position outside of the screen on random side
-    bool left = rand() % 2 == 0;
-    float x = (left ? +50 : Engine::GetInternalResolution().x - 50);
-    SetPosition({x, Game::FloorY - (size.y / 2)});
-
-    // Set initial velocity
-    moveDirection = {left ? 1 : -1, 0};    
-    lookDirection = {moveDirection.x, moveDirection.y};
-
 }
 
 
@@ -65,8 +55,12 @@ void EnemySmasher::Update()
             }
         }
         else
-        {
-            b2Body_SetLinearVelocity(physBodyId, {-moveDirection.x * 50, moveDirection.y});
+        {   
+            b2Vec2 velocity = b2Body_GetLinearVelocity(physBodyId);
+
+            if (abs(velocity.x) < 40)
+                b2Body_SetLinearVelocity(physBodyId, {-moveDirection.x * 50, moveDirection.y});
+
             lookDirection = {-moveDirection.x, moveDirection.y};
         }
     }

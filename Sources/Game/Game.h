@@ -6,6 +6,7 @@
 #include "Brick.h"
 #include "TowerTop.h"
 #include "Characters/Player.h"
+#include "Characters/Enemy.h"
 #include <vector>
 
 class Game
@@ -28,9 +29,12 @@ private:
 	Font font;
 	TowerTop* towerTop = nullptr;
 	Player* player = nullptr;
+	double enemySpawnInterval = 5;
+	double lastEnemySpawnTime = -1000;
 
 	void prepareScene();
     void generateTower();
 	void showEndGameScreen();
 	void drawUI();
+	void spawnEnemy();
 };

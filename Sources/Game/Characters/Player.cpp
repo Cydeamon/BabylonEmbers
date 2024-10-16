@@ -1,6 +1,6 @@
 #include "Player.h"
 #include <Game/PhysicsCategory.h>
-#include <Game/Arrow.h>
+#include <Game/Projectiles/Arrow.h>
 #include <iostream>
 
 Player::Player() : Character()
@@ -41,12 +41,12 @@ void Player::Update()
         {
             b2Vec2 finalVelocity = b2Body_GetLinearVelocity(physBodyId);
 
-            if (IsKeyDown(KEY_LEFT))
+            if (IsKeyDown(KEY_A))
             {
                 moveDirection.x = -1;
                 lookDirection.x = -1;
             }
-            else if (IsKeyDown(KEY_RIGHT))
+            else if (IsKeyDown(KEY_D))
             {
                 moveDirection.x += 1;
                 lookDirection.x = 1;

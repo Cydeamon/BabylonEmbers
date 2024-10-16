@@ -12,7 +12,7 @@ Character::Character()
 
     initPhysicsBody();
     SetDrawPriority(LOW);
-    bloodParticlesLeft = rand() % 30 + 30;
+    bloodParticlesLeft = rand() % 50 + rand() % 50;
 }
 
 
@@ -31,9 +31,9 @@ void Character::Update()
                 }
                 else if (!animationPaused)
                 {
-                    if (curFrame < totalFrames - 1)
-                        curFrame++;
-                    else
+                    curFrame = (curFrame + 1) % totalFrames;
+                    
+                    if (curFrame == 0)
                         animationPaused = true;
                 }
 
@@ -47,10 +47,31 @@ void Character::Update()
     }
     else
     {
-        if (bloodParticlesLeft > 0 && GetTime() - lastBleedTime > bleedInterval)
-            dropBloodParticle();
+        if (position.y > Engine::GetInternalResolution().y)
+            QueueDestroy();
+        else
+        {
+            if (bloodParticlesLeft > 0 && GetTime() - lastBleedTime > bleedInterval)
+                dropBloodParticle();
+
+            b2Vec2 pos = b2Body_GetWorldPoint(ragdollBodyId, { -extent.x, -extent.y });
+            position = {pos.x, pos.y};
             
+            if (destroyTimeStart == 0)
+                destroyTimeStart = GetTime();
+            else
+            {
+                if (GetTime() - destroyTimeStart > destroyTime)
+                {
+                    Engine::SetPhysFilterCategories(ragdollHeadShapeId, 0, 0);
+                    Engine::SetPhysFilterCategories(ragdollBodyShapeId, 0, 0);
+                    Engine::SetPhysFilterCategories(ragdollLegsShapeId, 0, 0);
+                }
+            }
+        }
     }
+
+    prevFrame = curFrame;
 }
 
 void Character::Draw()
@@ -79,7 +100,7 @@ void Character::Draw()
         {
             DrawRectanglePro(
                 {position.x,position.y, size.x, size.y},
-                {0},
+                {0}, 
                 RAD2DEG * b2Rot_GetAngle(b2Body_GetRotation(physBodyId)), 
                 RED
             );
@@ -136,17 +157,24 @@ void Character::initPhysicsBody()
 }
 
 
-void Character::Die()
+void Character::Die(Vector2 reactionDirection)
 {
     if (!dead)
     {
         dead = true;
-        createRagdollBodies();
+
+        if (reactionDirection.x != 0 || reactionDirection.y != 0)
+        {
+            bleedDirection = {reactionDirection.x, -reactionDirection.y};
+            bleedDirectionIsSet = true;
+        }
+        
+        createRagdollBodies(reactionDirection);
         b2DestroyBody(physBodyId);
     }
 }
 
-void Character::createRagdollBodies()
+void Character::createRagdollBodies(Vector2 reactionDirection)
 {
     // Create bodies
     Vector2 drawPos = {position.x + (size.x * 0.5f), position.y};
@@ -164,7 +192,7 @@ void Character::createRagdollBodies()
     b2Polygon headBodyCube = b2MakeBox(ragdollHeadExtent.x, ragdollHeadExtent.y);
     b2ShapeDef headShapeDef = b2DefaultShapeDef();
     headShapeDef.userData = this;
-    headShapeDef.friction = 0.05f;
+    headShapeDef.friction = 10;
     ragdollHeadShapeId = b2CreatePolygonShape(ragdollHeadId, &headShapeDef, &headBodyCube);
     drawPos.y += headSize.y;
 
@@ -175,7 +203,7 @@ void Character::createRagdollBodies()
     b2Polygon bodyBodyCube = b2MakeBox(ragdollBodyExtent.x, ragdollBodyExtent.y);
     b2ShapeDef bodyShapeDef = b2DefaultShapeDef();
     bodyShapeDef.userData = this;
-    bodyShapeDef.friction = 0.05f;
+    bodyShapeDef.friction = 10;
     ragdollBodyShapeId = b2CreatePolygonShape(ragdollBodyId, &bodyShapeDef, &bodyBodyCube);
     drawPos.y += bodySize.y;
 
@@ -183,10 +211,10 @@ void Character::createRagdollBodies()
     legsBodyDef.type = b2_dynamicBody;
     legsBodyDef.position = {drawPos.x, drawPos.y};
     ragdollLegsId = b2CreateBody(Engine::GetPhysWorldID(), &legsBodyDef);
-    b2Polygon legsBodyCube = b2MakeBox(ragdollLegsExtent.x, ragdollLegsExtent.y);
+    b2Polygon legsBodyCube = b2MakeBox(1, ragdollLegsExtent.y);
     b2ShapeDef legsShapeDef = b2DefaultShapeDef();
     legsShapeDef.userData = this;
-    legsShapeDef.friction = 0.05f;
+    legsShapeDef.friction = 10;
     ragdollLegsShapeId = b2CreatePolygonShape(ragdollLegsId, &legsShapeDef, &legsBodyCube);
 
     // Setup joints
@@ -211,14 +239,26 @@ void Character::createRagdollBodies()
     b2CreateRevoluteJoint(Engine::GetPhysWorldID(), &bodyJointDef);
 
     // Setup physics filters
-    Engine::SetPhysFilterCategories(ragdollHeadShapeId, filterCategories, filterMask);
-    Engine::SetPhysFilterCategories(ragdollBodyShapeId, filterCategories, filterMask);
-    Engine::SetPhysFilterCategories(ragdollLegsShapeId, filterCategories, filterMask);
+    uint64_t ragdollFilterCategories = GamePhysicsCategories::BODY;
+    uint64_t ragdollMaskCategories = GamePhysicsCategories::BODY | GamePhysicsCategories::GROUND | GamePhysicsCategories::TOWER_BRICK;
+    Engine::SetPhysFilterCategories(ragdollHeadShapeId, ragdollFilterCategories, ragdollMaskCategories);
+    Engine::SetPhysFilterCategories(ragdollBodyShapeId, ragdollFilterCategories, ragdollMaskCategories);
+    Engine::SetPhysFilterCategories(ragdollLegsShapeId, ragdollFilterCategories, ragdollMaskCategories);
 
     // Apply same velocity to bodies as physBodyId
-    b2Body_ApplyLinearImpulseToCenter(ragdollBodyId, b2Body_GetLinearVelocity(physBodyId), true);
-    b2Body_ApplyLinearImpulseToCenter(ragdollLegsId, b2Body_GetLinearVelocity(physBodyId), true);
-    b2Body_ApplyLinearImpulseToCenter(ragdollHeadId, b2Body_GetLinearVelocity(physBodyId), true);
+    if (reactionDirection.x != 0 || reactionDirection.y != 0)
+    {
+        b2Vec2 velocity = {reactionDirection.x * 25, reactionDirection.y * 25};
+        b2Body_ApplyLinearImpulseToCenter(ragdollBodyId, velocity, true);
+    }
+    else
+    {
+        b2Vec2 velocity = b2Body_GetLinearVelocity(physBodyId);
+        velocity.x *= -25 - (rand() % 5);
+        velocity.y = velocity.x;
+        velocity.x = lookDirection.x < 0 ? velocity.x : -velocity.x;
+        b2Body_ApplyLinearImpulseToCenter(ragdollBodyId, velocity, true);
+    }
 }
 
 void Character::dropBloodParticle()
@@ -226,12 +266,17 @@ void Character::dropBloodParticle()
     b2Vec2 pos = b2Body_GetPosition(ragdollBodyId);
 
     PhysicsRectangle *piece = new PhysicsRectangle(
-        {pos.x, pos.y},
+        {pos.x, pos.y - 3},
         {1, 1}, 
         PhysicsRectangle::BodyType::DYNAMIC
     );
-
+    
     b2Vec2 force = {(lookDirection.x < 0 ? 1 : -1) *(rand() % 25 - 50), rand() % 2 - 4};
+    int multiplier = rand() % 25 + 50;
+    
+    if (bleedDirectionIsSet)
+        force = {bleedDirection.x * multiplier * (lookDirection.x < 0 ? -1 : 1), bleedDirection.y * multiplier * -1};
+
     force = b2RotateVector(b2Body_GetRotation(ragdollBodyId), force);
     piece->SetColor(BLACK);
 

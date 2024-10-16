@@ -10,9 +10,8 @@ Brick::Brick(Vector2 position, Vector2 size, float gap) : PhysicsRectangle(posit
     SetPadding(gap);
     Engine::SetPhysFilterCategories(
         shapeId,
-        GamePhysicsCategories::TOWER_BRICK,
-        GamePhysicsCategories::DEBRIS | GamePhysicsCategories::TOWER_TOP | GamePhysicsCategories::PLAYER | GamePhysicsCategories::ENEMY | GamePhysicsCategories::ARROW |
-        GamePhysicsCategories::GROUND | GamePhysicsCategories::TOWER_BRICK 
+        TOWER_BRICK,
+        DEBRIS | TOWER_TOP | PLAYER | ENEMY | ARROW | GROUND | TOWER_BRICK | BODY | BOMB
     );
 
     b2Shape_SetUserData(shapeId, this);
@@ -21,9 +20,18 @@ Brick::Brick(Vector2 position, Vector2 size, float gap) : PhysicsRectangle(posit
 void Brick::Update() 
 {
     PhysicsRectangle::Update();
+    
+    if (IsMouseButtonPressed(0))
+    {
+        if (Engine::IsDebug())
+        {
+            if (IsPointWithinBody(Engine::GetMousePositionScaled()))
+                Destroy();
+        }
+    }
 }
 
-void Brick::Destroy()
+void Brick::Destroy(Vector2 reactionDirection)
 {
     int pieceSize = (rand() % 2) + 1;
     int piecesX;
@@ -46,14 +54,21 @@ void Brick::Destroy()
             float forceX = (rand() % maxForce * 2) - maxForce;
             float forceY = (rand() % maxForce * 2) - maxForce;
 
+            if (reactionDirection.x != 0 || reactionDirection.y != 0)
+            {
+                forceX = reactionDirection.x * maxForce;
+                forceY = reactionDirection.y * maxForce;
+            }
+
             b2Shape_SetDensity(piece->GetShapeId(), 100);
             piece->SetColor(BLACK);
             b2Shape_SetUserData(piece->GetShapeId(), piece);
 
             Engine::SetPhysFilterCategories(
                 piece->GetShapeId(),
-                GamePhysicsCategories::DEBRIS,
-                GamePhysicsCategories::DEBRIS | GamePhysicsCategories::TOWER_TOP | GamePhysicsCategories::TOWER_BRICK | GamePhysicsCategories::GROUND
+                DEBRIS,
+                GROUND | TOWER_BRICK | TOWER_TOP | 
+                BODY | BOMB
             );
             b2Body_ApplyLinearImpulse(piece->GetBodyId(), {forceX, forceY}, b2Body_GetWorldCenterOfMass(piece->GetBodyId()), true);
         }
@@ -62,10 +77,15 @@ void Brick::Destroy()
     QueueDestroy();
 }
 
-void Brick::Damage()
+void Brick::Damage(Vector2 reactionDirection)
 {
     health--;
 
     if (health <= 0)
-        Destroy();
+        Destroy(reactionDirection);
+
+    if (reactionDirection.x != 0 || reactionDirection.y != 0)
+    {        
+        b2Body_ApplyLinearImpulseToCenter(GetBodyId(), {reactionDirection.x * 1000, reactionDirection.y * 1000}, true);
+    }
 }

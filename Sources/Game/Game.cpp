@@ -3,6 +3,7 @@
 #include <iostream>
 #include "PhysicsCategory.h"
 #include "Characters/EnemySmasher.h"
+#include "Characters/EnemyBomber.h"
 
 Game::Game()
 {
@@ -14,12 +15,14 @@ Game::Game()
 void Game::Run()
 {
     prepareScene();
-    EnemySmasher enemySmasher;
 
     while (Engine::IsRunning())
     {   
         // Update 
         Engine::Update();
+
+        if (GetTime() - lastEnemySpawnTime > enemySpawnInterval)
+            spawnEnemy();
         
         // Draw
         Engine::Draw();
@@ -41,9 +44,9 @@ void Game::prepareScene()
 
     Engine::SetPhysFilterCategories(
         floor->GetShapeId(),
-        GamePhysicsCategories::GROUND,
-        GamePhysicsCategories::ENEMY | GamePhysicsCategories::TOWER_TOP | GamePhysicsCategories::TOWER_BRICK | 
-        GamePhysicsCategories::PLAYER | GamePhysicsCategories::ARROW | GamePhysicsCategories::DEBRIS
+        GROUND,
+        ENEMY | TOWER_TOP | TOWER_BRICK | BOMB |
+        PLAYER | ARROW | DEBRIS | BODY
     );
 
     generateTower();
@@ -97,4 +100,19 @@ void Game::drawUI()
 {
     if (player && player->IsDead())
         showEndGameScreen();
+}
+
+void Game::spawnEnemy()
+{
+    int type = rand() % 2;
+
+    switch (type)
+    {
+    case 0: new EnemySmasher(); break;
+    case 1: new EnemyBomber(); break;
+    // case 2: new EnemySmasher(); break;
+    // case 3: new EnemySmasher(); break;
+    }
+
+    lastEnemySpawnTime = GetTime();
 }

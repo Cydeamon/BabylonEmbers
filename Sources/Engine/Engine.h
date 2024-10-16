@@ -5,6 +5,7 @@
 #include "GameObjects/GameObject.h"
 #include <box2d/box2d.h>
 #include <vector>
+#include <map>
 #include <functional>
 
 namespace Engine
@@ -23,6 +24,7 @@ namespace Engine
     void ResortObjects();
     void SetDrawHUDCallback(std::function<void(void)> callback);
     void SetPhysFilterCategories(b2ShapeId shapeId, uint64_t filterCategories, uint64_t filterMask = 0);
+    std::map<GameObject*, Vector2> GetObjectsInRadius(float radius, Vector2 center);
 
     // Physics
     b2WorldId GetPhysWorldID();

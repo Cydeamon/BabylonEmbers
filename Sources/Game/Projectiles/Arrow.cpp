@@ -3,8 +3,8 @@
 #include <string>
 #include <Engine/Engine.h>
 #include <Game/PhysicsCategory.h>
-#include "Brick.h"
-#include "Characters/Enemy.h"
+#include <Game/Brick.h>
+#include <Game/Characters/Enemy.h>
 
 Arrow::Arrow(Vector2 initPosition, Vector2 size) : PhysicsRectangle(initPosition, size, DYNAMIC)
 {
@@ -53,7 +53,12 @@ void Arrow::processCollisions()
                     QueueDestroy();
 
                 if (enemy)
-                    enemy->Die();
+                {
+                    b2Vec2 hitDirection = {position.x - enemy->GetPosition().x, position.y - enemy->GetPosition().y};
+                    hitDirection = b2Normalize(hitDirection);
+                    enemy->Die({hitDirection.x, hitDirection.y});
+                    QueueDestroy();
+                }
             }
         }        
     }

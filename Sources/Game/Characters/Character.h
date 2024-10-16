@@ -10,10 +10,11 @@ public:
     void Draw() override;
     bool IsDead() { return dead; }
 
+    b2BodyId GetPhysBodyId() { return physBodyId; }
     Vector2 GetSize() { return size; }
     void SetPosition(Vector2 pos) override;
     void SetAnimationTexture(Texture2D *texture);
-    void Die();
+    void Die(Vector2 reactionDirection = {0});
 
 protected:
     Texture2D ragdollHeadTexture;
@@ -28,6 +29,7 @@ protected:
     bool dead = false;
     double frameDuration = 1.0f / 24.0f;
     double lastFrameTime;
+    int prevFrame = 0;
     int curFrame = 0;
     int totalFrames = 0;
     bool repeatAnimation = true;
@@ -53,8 +55,12 @@ protected:
     b2Vec2 ragdollLegsExtent = {0};
     uint64_t filterCategories = 0;
     uint64_t filterMask = 0;
+    double destroyTime = 15;
+    double destroyTimeStart = 0;
+    Vector2 bleedDirection = {0};
+    bool bleedDirectionIsSet = false;
     
     void initPhysicsBody();
-    void createRagdollBodies();
+    void createRagdollBodies(Vector2 reactionDirection = {0});
     void dropBloodParticle();
 };
