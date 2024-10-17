@@ -33,7 +33,10 @@ void EnemyBomber::Update()
         if (state == RUNNING)    
         {
             // Move in direction
-            b2Body_SetLinearVelocity(physBodyId, {moveDirection.x * 50, moveDirection.y});
+            b2Vec2 velocity = b2Body_GetLinearVelocity(physBodyId);
+
+            if (abs(velocity.x) < 40)
+                b2Body_SetLinearVelocity(physBodyId, {moveDirection.x * 50, moveDirection.y});
 
             // If close enough to center, throw bomb
             float distanceToCenter = abs((Engine::GetInternalResolution().x / 2) - (position.x + (size.x / 2)));

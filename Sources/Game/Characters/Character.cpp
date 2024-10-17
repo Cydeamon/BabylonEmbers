@@ -21,7 +21,7 @@ void Character::Update()
     if (!dead)
     {
         // Progress animation
-        if (currentTexture != nullptr)
+        if (currentTexture != nullptr && currentTexture->id != 0)
         {
             if (GetTime() - lastFrameTime > frameDuration)
             {
@@ -31,9 +31,9 @@ void Character::Update()
                 }
                 else if (!animationPaused)
                 {
-                    curFrame = (curFrame + 1) % totalFrames;
-                    
-                    if (curFrame == 0)
+                    if (curFrame < totalFrames - 1)
+                        curFrame++;
+                    else
                         animationPaused = true;
                 }
 
@@ -78,7 +78,7 @@ void Character::Draw()
 {    
     if (!dead)
     {
-        if (currentTexture != nullptr)
+        if (currentTexture && currentTexture->id != 0)
         {
             Rectangle sourceRect = {
                 (float) (curFrame % curTextureCols) * size.x, 
@@ -166,6 +166,10 @@ void Character::Die(Vector2 reactionDirection)
         if (reactionDirection.x != 0 || reactionDirection.y != 0)
         {
             bleedDirection = {reactionDirection.x, -reactionDirection.y};
+            b2Vec2 dir = {bleedDirection.x, bleedDirection.y};
+            dir = b2Normalize(dir);
+            bleedDirection.x = dir.x;
+            bleedDirection.y = dir.y;
             bleedDirectionIsSet = true;
         }
         

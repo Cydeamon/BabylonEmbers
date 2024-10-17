@@ -4,6 +4,7 @@
 #include "PhysicsCategory.h"
 #include "Characters/EnemySmasher.h"
 #include "Characters/EnemyBomber.h"
+#include "Characters/EnemyGunner.h"
 
 Game::Game()
 {
@@ -45,8 +46,7 @@ void Game::prepareScene()
     Engine::SetPhysFilterCategories(
         floor->GetShapeId(),
         GROUND,
-        ENEMY | TOWER_TOP | TOWER_BRICK | BOMB |
-        PLAYER | ARROW | DEBRIS | BODY
+        ENEMY | TOWER_TOP | TOWER_BRICK | BOMB | PLAYER | ARROW | DEBRIS | BODY
     );
 
     generateTower();
@@ -104,13 +104,13 @@ void Game::drawUI()
 
 void Game::spawnEnemy()
 {
-    int type = rand() % 2;
+    int type = rand() % 3;
 
     switch (type)
     {
     case 0: new EnemySmasher(); break;
     case 1: new EnemyBomber(); break;
-    // case 2: new EnemySmasher(); break;
+    case 2: new EnemyGunner(); break;
     // case 3: new EnemySmasher(); break;
     }
 
