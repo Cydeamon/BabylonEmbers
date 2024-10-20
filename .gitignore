@@ -2,3 +2,4 @@ build
 Bin/
 Deploy/
 *.in
+.cache

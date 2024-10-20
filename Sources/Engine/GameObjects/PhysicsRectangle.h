@@ -30,6 +30,7 @@ public:
     b2BodyId GetBodyId() { return bodyId; }
     b2ShapeId GetShapeId() { return shapeId; }
     Vector2 GetPosition() { return position; }
+    void SetLifeTime(float time);
 
 protected: 
     Vector2 position = {0};
@@ -39,6 +40,8 @@ protected:
     int outlineThickness = 1;
     Color outlineColor = GREEN;
     float padding = 0;
+    bool isLifeTimeSet = false;
+    double destroyTime = 0;
 
     BodyType bodyType = BodyType::DYNAMIC;
     b2BodyDef bodyDef;

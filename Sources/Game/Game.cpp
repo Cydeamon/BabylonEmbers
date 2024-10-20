@@ -5,6 +5,8 @@
 #include "Characters/EnemySmasher.h"
 #include "Characters/EnemyBomber.h"
 #include "Characters/EnemyGunner.h"
+#include "Characters/EnemyMolotov.h"
+#include "Projectiles/Molotov.h"
 
 Game::Game()
 {
@@ -24,7 +26,7 @@ void Game::Run()
 
         if (GetTime() - lastEnemySpawnTime > enemySpawnInterval)
             spawnEnemy();
-        
+
         // Draw
         Engine::Draw();
         
@@ -46,7 +48,7 @@ void Game::prepareScene()
     Engine::SetPhysFilterCategories(
         floor->GetShapeId(),
         GROUND,
-        ENEMY | TOWER_TOP | TOWER_BRICK | BOMB | PLAYER | ARROW | DEBRIS | BODY
+        ENEMY | TOWER_TOP | TOWER_BRICK | BOMB | PLAYER | ARROW | DEBRIS | BODY | MOLOTOV_PARTICLE
     );
 
     generateTower();
@@ -104,14 +106,14 @@ void Game::drawUI()
 
 void Game::spawnEnemy()
 {
-    int type = rand() % 3;
+    int type = rand() % 4;
 
     switch (type)
     {
     case 0: new EnemySmasher(); break;
     case 1: new EnemyBomber(); break;
     case 2: new EnemyGunner(); break;
-    // case 3: new EnemySmasher(); break;
+    case 3: new EnemyMolotov(); break;
     }
 
     lastEnemySpawnTime = GetTime();

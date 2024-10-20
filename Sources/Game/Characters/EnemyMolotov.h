@@ -4,21 +4,21 @@
 #include "Game/Brick.h"
 #include "Enemy.h"
 
-class EnemyBomber : public Enemy
+class EnemyMolotov : public Enemy
 {
 public:
-    EnemyBomber();
+    EnemyMolotov();
     void Update() override;
-    enum EnemyBomberState { RUNNING, ATTACK };
-    void SetState(EnemyBomberState state) { this->state = state; }
+    enum EnemyMolotovState { RUNNING, ATTACK };
+    void SetState(EnemyMolotovState state) { this->state = state; }
 
 private:
     Texture2D spritesheetTextureAttack;
     Texture2D spritesheetTextureRunning;
-    EnemyBomberState state = RUNNING;
+    EnemyMolotovState state = RUNNING;
     bool attacked = false;
     double waitTimeAfterThrow = 5.0f;
-    double waitTimeStart = 0;
+    double waitTimeStart = -1000;
 
     static float raycastResultCallback(b2ShapeId shapeId, b2Vec2 point, b2Vec2 normal, float fraction, void *context);
 

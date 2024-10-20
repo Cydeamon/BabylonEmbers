@@ -7,7 +7,7 @@ Enemy::Enemy() : Character()
 {
     // Setup physics filters
     filterCategories = GamePhysicsCategories::ENEMY;
-    filterMask = ENEMY | GROUND | TOWER_BRICK | ARROW | TOWER_TOP | PLAYER;
+    filterMask = ENEMY | GROUND | TOWER_BRICK | ARROW | TOWER_TOP | PLAYER | MOLOTOV_PARTICLE;
 
     Engine::SetPhysFilterCategories(
         physShapeId,

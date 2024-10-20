@@ -48,6 +48,9 @@ void PhysicsRectangle::Update()
 
     if (position.x < 0 || position.x > Engine::GetInternalResolution().x || position.y < 0 || position.y > Engine::GetInternalResolution().y)
         QueueDestroy();
+
+    if (isLifeTimeSet && GetTime() > destroyTime)
+        QueueDestroy();
 }
 
 void PhysicsRectangle::SetPadding(float padding)
@@ -94,4 +97,10 @@ Vector2 PhysicsRectangle::GetRotationDirection()
 {
     b2Rot rotation = b2Body_GetRotation(bodyId);
     return {rotation.c, rotation.s};
+}
+
+void PhysicsRectangle::SetLifeTime(float time)
+{
+    isLifeTimeSet = true;
+    destroyTime = GetTime() + time;
 }

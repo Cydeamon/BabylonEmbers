@@ -157,7 +157,7 @@ void Character::initPhysicsBody()
 }
 
 
-void Character::Die(Vector2 reactionDirection)
+void Character::Die(Vector2 reactionDirection, float reactionForce, bool dismember)
 {
     if (!dead)
     {
@@ -173,12 +173,12 @@ void Character::Die(Vector2 reactionDirection)
             bleedDirectionIsSet = true;
         }
         
-        createRagdollBodies(reactionDirection);
+        createRagdollBodies(reactionDirection, reactionForce, dismember);
         b2DestroyBody(physBodyId);
     }
 }
 
-void Character::createRagdollBodies(Vector2 reactionDirection)
+void Character::createRagdollBodies(Vector2 reactionDirection, float reactionForce, bool dismember)
 {
     // Create bodies
     Vector2 drawPos = {position.x + (size.x * 0.5f), position.y};
@@ -222,25 +222,28 @@ void Character::createRagdollBodies(Vector2 reactionDirection)
     ragdollLegsShapeId = b2CreatePolygonShape(ragdollLegsId, &legsShapeDef, &legsBodyCube);
 
     // Setup joints
-    b2RevoluteJointDef headJointDef = b2DefaultRevoluteJointDef();
-    headJointDef.bodyIdA = ragdollHeadId;
-    headJointDef.bodyIdB = ragdollBodyId;
-    headJointDef.localAnchorA = { 0, ragdollHeadExtent.y };
-    headJointDef.localAnchorB = { 0, -ragdollBodyExtent.y };
-    headJointDef.lowerAngle = (-b2_pi/2);
-    headJointDef.upperAngle = (b2_pi/2);
-    headJointDef.enableLimit = true;
-    b2CreateRevoluteJoint(Engine::GetPhysWorldID(), &headJointDef);
+    if (!dismember)
+    {
+        b2RevoluteJointDef headJointDef = b2DefaultRevoluteJointDef();
+        headJointDef.bodyIdA = ragdollHeadId;
+        headJointDef.bodyIdB = ragdollBodyId;
+        headJointDef.localAnchorA = { 0, ragdollHeadExtent.y };
+        headJointDef.localAnchorB = { 0, -ragdollBodyExtent.y };
+        headJointDef.lowerAngle = (-b2_pi/2);
+        headJointDef.upperAngle = (b2_pi/2);
+        headJointDef.enableLimit = true;
+        b2CreateRevoluteJoint(Engine::GetPhysWorldID(), &headJointDef);
 
-    b2RevoluteJointDef bodyJointDef = b2DefaultRevoluteJointDef();
-    bodyJointDef.bodyIdA = ragdollBodyId;
-    bodyJointDef.bodyIdB = ragdollLegsId;
-    bodyJointDef.localAnchorA = { 0, ragdollBodyExtent.y };
-    bodyJointDef.localAnchorB = { 0, -ragdollLegsExtent.y };
-    bodyJointDef.lowerAngle = (-b2_pi/2);
-    bodyJointDef.upperAngle = (b2_pi);
-    bodyJointDef.enableLimit = true;
-    b2CreateRevoluteJoint(Engine::GetPhysWorldID(), &bodyJointDef);
+        b2RevoluteJointDef bodyJointDef = b2DefaultRevoluteJointDef();
+        bodyJointDef.bodyIdA = ragdollBodyId;
+        bodyJointDef.bodyIdB = ragdollLegsId;
+        bodyJointDef.localAnchorA = { 0, ragdollBodyExtent.y };
+        bodyJointDef.localAnchorB = { 0, -ragdollLegsExtent.y };
+        bodyJointDef.lowerAngle = (-b2_pi/2);
+        bodyJointDef.upperAngle = (b2_pi);
+        bodyJointDef.enableLimit = true;
+        b2CreateRevoluteJoint(Engine::GetPhysWorldID(), &bodyJointDef);
+    }
 
     // Setup physics filters
     uint64_t ragdollFilterCategories = GamePhysicsCategories::BODY;
@@ -252,8 +255,14 @@ void Character::createRagdollBodies(Vector2 reactionDirection)
     // Apply same velocity to bodies as physBodyId
     if (reactionDirection.x != 0 || reactionDirection.y != 0)
     {
-        b2Vec2 velocity = {reactionDirection.x * 25, reactionDirection.y * 25};
+        b2Vec2 velocity = {reactionDirection.x * reactionForce, reactionDirection.y * reactionForce};
         b2Body_ApplyLinearImpulseToCenter(ragdollBodyId, velocity, true);
+
+        if (dismember)
+        {
+            b2Body_ApplyLinearImpulseToCenter(ragdollHeadId, velocity, true);
+            b2Body_ApplyLinearImpulseToCenter(ragdollLegsId, velocity, true);
+        }
     }
     else
     {
@@ -262,6 +271,12 @@ void Character::createRagdollBodies(Vector2 reactionDirection)
         velocity.y = velocity.x;
         velocity.x = lookDirection.x < 0 ? velocity.x : -velocity.x;
         b2Body_ApplyLinearImpulseToCenter(ragdollBodyId, velocity, true);
+
+        if (dismember)
+        {
+            b2Body_ApplyLinearImpulseToCenter(ragdollHeadId, velocity, true);
+            b2Body_ApplyLinearImpulseToCenter(ragdollLegsId, velocity, true);
+        }
     }
 }
 

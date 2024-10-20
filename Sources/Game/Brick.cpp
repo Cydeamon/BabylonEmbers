@@ -11,7 +11,7 @@ Brick::Brick(Vector2 position, Vector2 size, float gap) : PhysicsRectangle(posit
     Engine::SetPhysFilterCategories(
         shapeId,
         TOWER_BRICK,
-        DEBRIS | TOWER_TOP | PLAYER | ENEMY | ARROW | GROUND | TOWER_BRICK | BODY | BOMB
+        DEBRIS | TOWER_TOP | PLAYER | ENEMY | ARROW | GROUND | TOWER_BRICK | BODY | BOMB | MOLOTOV_PARTICLE
     );
 
     b2Shape_SetUserData(shapeId, this);

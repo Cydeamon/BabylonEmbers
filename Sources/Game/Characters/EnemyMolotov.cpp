@@ -1,18 +1,17 @@
-#include "EnemyBomber.h"
+#include "EnemyMolotov.h"
 #include <iostream>
 #include <Game/PhysicsCategory.h>
 #include <Game/Game.h>
-#include <Game/Projectiles/Bomb.h>
-#include <Game/Characters/Player.h>
+#include <Game/Projectiles/Molotov.h>
 
-EnemyBomber::EnemyBomber() : Enemy()
+EnemyMolotov::EnemyMolotov() : Enemy()
 {
-    spritesheetTextureAttack = LoadTexture("Assets/EnemyBomberAttack.png");
-    spritesheetTextureRunning = LoadTexture("Assets/EnemyBomberRun.png");
+    spritesheetTextureAttack = LoadTexture("Assets/EnemyMolotovAttack.png");
+    spritesheetTextureRunning = LoadTexture("Assets/EnemyMolotovRun.png");
     b2Shape_SetUserData(physShapeId, this);
 }
 
-void EnemyBomber::Update()
+void EnemyMolotov::Update()
 {
     Enemy::Update();
 
@@ -25,10 +24,8 @@ void EnemyBomber::Update()
             repeatAnimation = false;
         }        
 
-        if (animationPaused && state == ATTACK) 
-        {
+        if (state == ATTACK && animationPaused)
             curFrame = 0;
-        }
 
         if (state == RUNNING && currentTexture != &spritesheetTextureRunning)
             SetAnimationTexture(&spritesheetTextureRunning);
@@ -36,39 +33,29 @@ void EnemyBomber::Update()
         if (state == RUNNING)    
         {
             // Move in direction
-            if (Player::BelowThreshold)
-                moveDirection = {Player::Position.x < 0 ? -1 : 1, 0};
-
             b2Vec2 velocity = b2Body_GetLinearVelocity(physBodyId);
 
             if (abs(velocity.x) < 40)
                 b2Body_SetLinearVelocity(physBodyId, {moveDirection.x * 50, moveDirection.y});
 
             // If close enough to center, throw bomb
-            float distance = abs((Engine::GetInternalResolution().x / 2) - (position.x + (size.x / 2)));
+            float distanceToCenter = abs((Engine::GetInternalResolution().x / 2) - (position.x + (size.x / 2)));
 
-            if (Player::BelowThreshold)
-                distance = abs(Player::Position.x - position.x);
-
-            if (distance < 150)
-                state = EnemyBomber::ATTACK;
+            if (distanceToCenter < 150)
+                state = EnemyMolotov::ATTACK;
         }
 
         if (GetTime() - waitTimeStart > waitTimeAfterThrow)
         {   
-            if (animationPaused)
+            if (curFrame == 0)
             {
                 attacked = false;
                 animationPaused = false;
             }
 
             if (state == ATTACK && !attacked && curFrame == 8)
-            {                
-                if (Player::BelowThreshold)
-                    new Bomb(this, position);
-                else 
-                    new Bomb(this, {lookDirection.x,  lookDirection.y}, position, {2, 2});
-
+            {
+                new Molotov(position);
                 waitTimeStart = GetTime();
                 attacked = true;
             }

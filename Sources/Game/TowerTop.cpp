@@ -67,7 +67,7 @@ b2ShapeId TowerTop::attachPhysShapeToBody(b2BodyId bodyId, std::vector<b2Vec2> v
     Engine::SetPhysFilterCategories(
         shapeId,
         TOWER_TOP,
-        DEBRIS | PLAYER | ENEMY | ARROW | TOWER_BRICK | GROUND | BOMB
+        DEBRIS | PLAYER | ENEMY | ARROW | TOWER_BRICK | GROUND | BOMB | MOLOTOV_PARTICLE
     );
 
     return shapeId;

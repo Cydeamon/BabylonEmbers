@@ -3,15 +3,16 @@
 
 enum GamePhysicsCategories
 {
-    PLAYER 		= 0b000000001,
-    ENEMY  		= 0b000000010,
-    GROUND 		= 0b000000100,
-    TOWER_BRICK = 0b000001000,
-    ARROW 		= 0b000010000,
-    TOWER_TOP 	= 0b000100000,
-    DEBRIS      = 0b001000000,
-    BODY        = 0b010000000,
-    BOMB        = 0b100000000
+    PLAYER 		      = 0b0000000001,
+    ENEMY  		      = 0b0000000010,
+    GROUND 		      = 0b0000000100,
+    TOWER_BRICK       = 0b0000001000,
+    ARROW 		      = 0b0000010000,
+    TOWER_TOP 	      = 0b0000100000,
+    DEBRIS            = 0b0001000000,
+    BODY              = 0b0010000000,
+    BOMB              = 0b0100000000,
+    MOLOTOV_PARTICLE  = 0b1000000000
 };
 
 #endif

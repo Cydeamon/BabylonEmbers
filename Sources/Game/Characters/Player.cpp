@@ -1,7 +1,13 @@
 #include "Player.h"
+#include "box2d/box2d.h"
+#include "box2d/types.h"
 #include <Game/PhysicsCategory.h>
 #include <Game/Projectiles/Arrow.h>
 #include <iostream>
+
+Vector2 Player::Position = {0};
+bool Player::IsGrounded = false;
+bool Player::BelowThreshold = false;
 
 Player::Player() : Character()
 {
@@ -11,10 +17,9 @@ Player::Player() : Character()
     
     // Setup physics filters
     filterCategories = GamePhysicsCategories::PLAYER;
-    filterMask = 
-        GamePhysicsCategories::ENEMY | GamePhysicsCategories::GROUND | GamePhysicsCategories::TOWER_BRICK | 
-        GamePhysicsCategories::ARROW | GamePhysicsCategories::TOWER_TOP | GamePhysicsCategories::PLAYER;
+    filterMask = ENEMY | GROUND | TOWER_BRICK | ARROW | TOWER_TOP | PLAYER | MOLOTOV_PARTICLE;
 
+    b2Shape_SetUserData(physShapeId, this);
 }
 
 
@@ -74,7 +79,6 @@ void Player::Update()
             }
         }
 
-
         // Rotate weapon
         weaponAngle = atan2(Engine::GetMousePositionScaled().y - position.y, Engine::GetMousePositionScaled().x - position.x);
         weaponAngle *= RAD2DEG;
@@ -99,10 +103,15 @@ void Player::Update()
             SetAnimationTexture(&spritesheetTextureRunning);
             frameDuration = 1.0f / 24.0f;
         }
+
+        processCollisions();
     }
+
+    Position = position;
+    BelowThreshold = position.y > thresholdHeight;
 }
 
-void Player::Draw()
+void Player::Draw() 
 {
     Character::Draw();
 
@@ -123,4 +132,20 @@ void Player::shot()
 {
     Vector2 arrowStartPos = {lookDirection.x > 0 ? position.x + 10 : position.x + 3, lookDirection.x > 0 ? position.y + 9 : position.y + 9};
     new Arrow(arrowStartPos);
+}
+
+void Player::processCollisions()
+{
+    int bodyContactCapacity = b2Body_GetContactCapacity(physBodyId);
+    b2ContactData contactData[bodyContactCapacity];
+    int bodyContactCount = b2Body_GetContactData(physBodyId, contactData, bodyContactCapacity);
+
+    for (int i = 0; i < bodyContactCapacity && i < bodyContactCount; i++)
+    {
+        b2ContactData* data = contactData + i;
+        b2Filter filter1 = b2Shape_GetFilter(data->shapeIdA);
+        b2Filter filter2 = b2Shape_GetFilter(data->shapeIdB);
+        
+        IsGrounded = (filter1.categoryBits & GROUND) || (filter2.categoryBits & GROUND);
+    }
 }

@@ -6,7 +6,7 @@
 #include <Game/Brick.h>
 #include <Game/Characters/Player.h>
 
-Bomb::Bomb(Enemy* thrower, Vector2 lookDirection, Vector2 initPosition, Vector2 size) : PhysicsRectangle(initPosition, size, DYNAMIC)
+Bomb::Bomb(Enemy* thrower, Vector2 lookDirection, Vector2 initPosition, Vector2 size) : PhysicsRectangle(initPosition, size)
 {
     this->thrower = thrower;
     countStartTime = GetTime();
@@ -18,6 +18,33 @@ Bomb::Bomb(Enemy* thrower, Vector2 lookDirection, Vector2 initPosition, Vector2 
         lookDirection.x < 0 ? (DEG2RAD * -90) : 0, 
         lookDirection.x > 0 ? (DEG2RAD * -90) : 0
     }, force);
+
+    b2Shape_SetDensity(shapeId, 100);
+    SetColor(BLACK);
+    b2Shape_SetUserData(shapeId, this);
+
+    Engine::SetPhysFilterCategories(
+        shapeId,
+        BOMB,
+        TOWER_TOP | TOWER_BRICK | ENEMY | PLAYER | ARROW | GROUND
+    );
+
+    b2Body_ApplyLinearImpulseToCenter(bodyId, force, true);
+}
+
+Bomb::Bomb(Enemy* thrower, Vector2 initPosition, Vector2 size) : PhysicsRectangle(initPosition, size)
+{
+    countStartTime = GetTime();
+
+    float angleToPlayer = atan2(Player::Position.y - position.y, Player::Position.x - position.x);    
+    int maxForce = 350 - (50 - (rand() % 100));
+    float xDistanceToPlayer = abs(Player::Position.x - position.x);
+
+    if (Player::BelowThreshold)
+        maxForce = xDistanceToPlayer * 25;
+
+    b2Vec2 force = {maxForce, 0};
+    force = b2RotateVector({cos(angleToPlayer), sin(angleToPlayer)}, force);
 
     b2Shape_SetDensity(shapeId, 100);
     SetColor(BLACK);
@@ -90,9 +117,9 @@ void Bomb::explode()
         }
 
         if (player)
-            player->Die(relativeToCenter);
+            player->Die(relativeToCenter, 250, true);
 
         if (enemy)
-            enemy->Die(relativeToCenter);
+            enemy->Die(relativeToCenter, 250, true);
     }
 }

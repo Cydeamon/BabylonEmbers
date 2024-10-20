@@ -29,7 +29,7 @@ private:
 	Font font;
 	TowerTop* towerTop = nullptr;
 	Player* player = nullptr;
-	double enemySpawnInterval = 1;
+	double enemySpawnInterval = 2;
 	double lastEnemySpawnTime = -1000;
 
 	void prepareScene();
