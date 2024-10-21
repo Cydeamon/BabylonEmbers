@@ -56,7 +56,7 @@ void Arrow::processCollisions()
                 {
                     b2Vec2 hitDirection = {position.x - enemy->GetPosition().x, position.y - enemy->GetPosition().y};
                     hitDirection = b2Normalize(hitDirection);
-                    enemy->Die({hitDirection.x, hitDirection.y});
+                    enemy->Die({hitDirection.x, hitDirection.y}, 1000);
                     QueueDestroy();
                 }
             }

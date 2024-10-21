@@ -1,4 +1,5 @@
 #include "EnemyMolotov.h"
+#include "Engine/Engine.h"
 #include <iostream>
 #include <Game/PhysicsCategory.h>
 #include <Game/Game.h>
@@ -53,11 +54,16 @@ void EnemyMolotov::Update()
                 animationPaused = false;
             }
 
-            if (state == ATTACK && !attacked && curFrame == 8)
-            {
-                new Molotov(position);
-                waitTimeStart = GetTime();
-                attacked = true;
+            if (state == ATTACK)
+            {                
+                lookDirection.x = Player::Position.x < position.x ? -1 : 1;
+
+                if (!attacked && curFrame == 8)
+                {
+                    new Molotov(position);
+                    waitTimeStart = GetTime();
+                    attacked = true;
+                }
             }
         }
     }

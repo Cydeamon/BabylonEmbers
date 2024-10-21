@@ -7,6 +7,7 @@
 
 Vector2 Player::Position = {0};
 bool Player::IsGrounded = false;
+bool Player::IsAlive = true;
 bool Player::BelowThreshold = false;
 
 Player::Player() : Character()
@@ -109,6 +110,7 @@ void Player::Update()
 
     Position = position;
     BelowThreshold = position.y > thresholdHeight;
+    IsAlive = !dead;
 }
 
 void Player::Draw() 

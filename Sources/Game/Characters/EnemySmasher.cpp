@@ -1,4 +1,6 @@
 #include "EnemySmasher.h"
+#include "Engine/Engine.h"
+#include "Game/Characters/Player.h"
 #include <iostream>
 #include <Game/PhysicsCategory.h>
 #include <Game/Game.h>
@@ -10,14 +12,17 @@ EnemySmasher::EnemySmasher() : Enemy()
     b2Shape_SetUserData(physShapeId, this);
 }
 
-
-
 void EnemySmasher::Update()
 {
     Enemy::Update();
 
     if (!dead)
-    {
+    {       
+        if (Player::IsGrounded && Player::IsAlive)
+            moveDirection = { position.x < Player::Position.x ? 1 : -1, 0 };
+        else            
+            moveDirection = { position.x > (Engine::GetMousePositionScaled().x / 2) ? 1 : -1, 0 };
+
         processCollisions();
 
         // Set animation texture
@@ -30,6 +35,7 @@ void EnemySmasher::Update()
         if (GetTime() - waitTimeStart > waitTimeAfterDestroy)
         {
             lookDirection = {moveDirection.x, moveDirection.y};
+
             // Move in direction
             if (state == RUNNING)    
                 b2Body_SetLinearVelocity(physBodyId, {moveDirection.x * 50, moveDirection.y});
@@ -50,6 +56,20 @@ void EnemySmasher::Update()
                         state = RUNNING;
                         targetBrick = nullptr;
                         waitTimeStart = GetTime();
+                    }
+                }
+
+                if (curFrame == 8 && !wasAttacked && targetPlayer && Player::IsGrounded)
+                {
+                    if (abs(position.x - Player::Position.x) <= 20)
+                    {
+                        targetPlayer->Die(
+                            {Player::Position.x - position.x, Player::Position.y - position.y},
+                            100
+                        );
+
+                        targetPlayer = nullptr;
+                        state = RUNNING;
                     }
                 }
             }
@@ -87,6 +107,7 @@ void EnemySmasher::processCollisions()
                 {
                     GameObject* other = (GameObject*) contacts[j];
                     Brick* otherBrick = dynamic_cast<Brick*>(other);
+                    Player *player = dynamic_cast<Player*>(other);
                     
                     if (otherBrick && state == EnemySmasherState::RUNNING)
                     {
@@ -94,8 +115,15 @@ void EnemySmasher::processCollisions()
                         targetBrick = otherBrick;
                         b2Body_SetLinearVelocity(physBodyId, {0, 0});
                     }
+
+                    if (player)
+                    {
+                        state = EnemySmasherState::ATTACK;
+                        targetPlayer = player;
+                        b2Body_SetLinearVelocity(physBodyId, {0, 0});
+                    }
                 }
-            }        
+            }
         }
     }
 }

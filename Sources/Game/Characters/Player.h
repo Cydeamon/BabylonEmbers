@@ -16,6 +16,7 @@ public:
 
     static Vector2 Position;
     static bool IsGrounded;
+    static bool IsAlive;
     static bool BelowThreshold;
 
 private:

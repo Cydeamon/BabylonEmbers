@@ -24,8 +24,11 @@ void Game::Run()
         // Update 
         Engine::Update();
 
-        if (GetTime() - lastEnemySpawnTime > enemySpawnInterval)
-            spawnEnemy();
+        if (Player::IsAlive)
+        {
+            if (GetTime() - lastEnemySpawnTime > enemySpawnInterval)
+                spawnEnemy();
+        }
 
         // Draw
         Engine::Draw();

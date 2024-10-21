@@ -5,23 +5,29 @@
 #include <Game/PhysicsCategory.h>
 #include <Game/Brick.h>
 #include <Game/Characters/Enemy.h>
+#include <Game/Characters/Player.h>
 
 Bullet::Bullet(Vector2 initPosition, bool xPositive, Vector2 size) : PhysicsRectangle(initPosition, size, DYNAMIC)
 {
     Engine::SetPhysFilterCategories(
         shapeId, 
-        GamePhysicsCategories::ARROW, 
-        0 // GamePhysicsCategories::ENEMY | GamePhysicsCategories::TOWER_BRICK
+        ARROW, 
+        0
     );
 
     b2Shape_SetDensity(shapeId, 0);
     b2Shape_SetUserData(shapeId, this);
 
+    float random = (rand() % 15) / 10.0f;
+    float bulletAngle = (random + -3.0f) * DEG2RAD * (xPositive ? 1 : -1);
 
-    float bulletAngle = (((rand() % 15) / 10.0f) + -3.0f) * DEG2RAD;
-    bulletAngle = atan2(bulletAngle, 0.1);
+    if (Player::BelowThreshold)
+        bulletAngle = atan2(-(random + -3.0f) + Player::Position.y + 4 - position.y, Player::Position.x - position.x);
+
+    // bulletAngle = atan2(bulletAngle, 0.1);
     this->SetRotation(b2Rot{cos(bulletAngle), sin(bulletAngle)});
-    this->SetVelocity({(400 * cos(bulletAngle)) * (xPositive ? 1 : -1), 400 * sin(bulletAngle)});
+    this->SetVelocity({300 * cos(bulletAngle), 300 * sin(bulletAngle)});
+    this->SetColor(RED);
 }
 
 void Bullet::Update() 
@@ -49,7 +55,7 @@ void Bullet::processCollisions()
             {
                 GameObject* other = (GameObject*) contacts[j];
                 Brick* brick = dynamic_cast<Brick*>(other);
-                Enemy* enemy = dynamic_cast<Enemy*>(other);
+                Character* character = dynamic_cast<Character*>(other);
                 
                 if (brick)
                 {
@@ -57,11 +63,11 @@ void Bullet::processCollisions()
                     QueueDestroy();
                 }
 
-                if (enemy)
+                if (character)
                 {
-                    b2Vec2 hitDirection = {position.x - enemy->GetPosition().x, position.y - enemy->GetPosition().y};
+                    b2Vec2 hitDirection = {position.x - character->GetPosition().x, position.y - (character->GetPosition().y + 4)};
                     hitDirection = b2Normalize(hitDirection);
-                    enemy->Die({hitDirection.x, hitDirection.y});
+                    character->Die({hitDirection.x, hitDirection.y}, 2500, true);
                     QueueDestroy();
                 }
             }

@@ -1,4 +1,5 @@
 #include "EnemyGunner.h"
+#include "Engine/Engine.h"
 #include <iostream>
 #include <Game/PhysicsCategory.h>
 #include <Game/Game.h>
@@ -19,6 +20,11 @@ void EnemyGunner::Update()
 
     if (!dead)
     {
+        if (Player::IsGrounded && Player::IsAlive)
+            moveDirection = { position.x < Player::Position.x ? 1 : -1, 0 };
+        else            
+            moveDirection = { position.x > (Engine::GetMousePositionScaled().x / 2) ? 1 : -1, 0 };
+
         if (state != WAITING)
         {
             if (state == ATTACK_START && currentTexture != &spritesheetTextureAttackStart)
@@ -58,14 +64,20 @@ void EnemyGunner::Update()
             {
                 // Move in direction
                 b2Vec2 velocity = b2Body_GetLinearVelocity(physBodyId);
+                int centerX = Engine::GetInternalResolution().x / 2;
 
                 if (abs(velocity.x) < 20)
                     b2Body_SetLinearVelocity(physBodyId, {moveDirection.x * 25, moveDirection.y});
 
                 // If close enough to center, throw bomb
-                float distanceToCenter = abs((Engine::GetInternalResolution().x / 2) - (position.x + (size.x / 2)));
+                float distance = abs((Engine::GetInternalResolution().x / 2) - (position.x + (size.x / 2)));
+                bool onTheSameSide = (Player::Position.x < centerX && position.x < centerX) || (Player::Position.x > centerX && position.x > centerX);
 
-                if (distanceToCenter < 200)
+                if (Player::BelowThreshold)
+                    distance = abs(Player::Position.x - position.x);
+
+
+                if (Player::BelowThreshold && onTheSameSide ? distance < 100 : distance < 200)
                 {
                     state = EnemyGunner::ATTACK_START;
                     attackStartTime = GetTime();
@@ -95,7 +107,7 @@ void EnemyGunner::Update()
                 }
             }
             else
-                state = WAITING;
+                state = RUNNING;
         }
         else
         {
@@ -110,6 +122,6 @@ void EnemyGunner::Update()
 
 void EnemyGunner::shot()
 {
-    Vector2 bulletStartPos = {lookDirection.x > 0 ? position.x + 20 : position.x - 20, lookDirection.x > 0 ? position.y + 9 : position.y + 9};
+    Vector2 bulletStartPos = {lookDirection.x > 0 ? position.x + 17 : position.x + 5, position.y + 10};
     new Bullet(bulletStartPos, lookDirection.x > 0);
 }

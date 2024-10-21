@@ -1,4 +1,5 @@
 #include "Character.h"
+#include "Player.h"
 #include <iostream>
 #include <Engine/GameObjects/PhysicsRectangle.h>
 #include <Game/PhysicsCategory.h>
@@ -18,6 +19,9 @@ Character::Character()
 
 void Character::Update()
 {
+    if (!Player::IsAlive)
+        return;
+
     if (!dead)
     {
         // Progress animation
