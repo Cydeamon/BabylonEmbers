@@ -37,7 +37,7 @@ void EnemyBomber::Update()
         {
             // Move in direction
             if (Player::BelowThreshold)
-                moveDirection = {Player::Position.x < 0 ? -1 : 1, 0};
+                moveDirection = {Player::Position.x < 0 ? -1.0f : 1.0f, 0};
 
             b2Vec2 velocity = b2Body_GetLinearVelocity(physBodyId);
 

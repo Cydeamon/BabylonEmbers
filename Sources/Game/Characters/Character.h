@@ -14,7 +14,7 @@ public:
     Vector2 GetSize() { return size; }
     void SetPosition(Vector2 pos) override;
     void SetAnimationTexture(Texture2D *texture);
-    void Die(Vector2 reactionDirection = {0}, float reactionForce = 25, bool dismember = false);
+    virtual void Die(Vector2 reactionDirection = {0}, float reactionForce = 25, bool dismember = false);
 
 protected:
     Texture2D ragdollHeadTexture;

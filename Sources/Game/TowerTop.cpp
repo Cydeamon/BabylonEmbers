@@ -9,7 +9,6 @@ TowerTop::TowerTop()
 
 TowerTop::~TowerTop()
 {
-    b2DestroyChain(physChainId);
 }
 
 void TowerTop::Draw()
@@ -43,27 +42,30 @@ void TowerTop::initPhysicsBody()
 	bodyDef.type = b2_dynamicBody;
 
 	physBodyId = b2CreateBody( Engine::GetPhysWorldID(), &bodyDef );    
-    attachPhysShapeToBody(physBodyId, {{0, 0}, {3, 14}, {0, 14}});
-    attachPhysShapeToBody(physBodyId, {{79, 0}, {79, 14}, {76, 14}});
-    attachPhysShapeToBody(physBodyId, {{3, 15}, {76, 15}, {69, 26}, {10, 26}});
+    physShapes.push_back(attachPhysShapeToBody(physBodyId, {{0, 0}, {3, 14}, {0, 14}}));
+    physShapes.push_back(attachPhysShapeToBody(physBodyId, {{79, 0}, {79, 14}, {76, 14}}));
+    physShapes.push_back(attachPhysShapeToBody(physBodyId, {{3, 15}, {76, 15}, {69, 26}, {10, 26}}));
+    physBodies.push_back(physBodyId);
+
 }
 
 
 b2ShapeId TowerTop::attachPhysShapeToBody(b2BodyId bodyId, std::vector<b2Vec2> vertices, float density, float friction)
 {        
-    b2Vec2 verticesArr[vertices.size()];
+    const int vertSize = vertices.size();
+    b2Vec2* verticesArr = new b2Vec2[vertSize];
 
-    for (int i = 0; i < vertices.size(); i++)
+    for (int i = 0; i < vertSize; i++)
         verticesArr[i] = vertices[i];
 
-    b2Hull hull = b2ComputeHull( verticesArr, vertices.size() );
-    b2Polygon shape = b2MakePolygon( &hull, 0.15f);
+    b2Hull hull = b2ComputeHull(verticesArr, vertSize);
+    b2Polygon shape = b2MakePolygon(&hull, 0.15f);
     b2ShapeDef shapeDef = b2DefaultShapeDef();
     shapeDef.density = density;
     shapeDef.friction = friction;
     shapeDef.userData = this;
 
-    b2ShapeId shapeId = b2CreatePolygonShape( bodyId, &shapeDef, &shape );
+    b2ShapeId shapeId = b2CreatePolygonShape(bodyId, &shapeDef, &shape );
     Engine::SetPhysFilterCategories(
         shapeId,
         TOWER_TOP,

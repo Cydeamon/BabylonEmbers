@@ -2,14 +2,12 @@
 
 #include <Engine/Engine.h>
 
-
 class PhysicsRectangle : public GameObject
 {
 public: 
     enum BodyType { STATIC, DYNAMIC, KINEMATIC };
 
     PhysicsRectangle(Vector2 position, Vector2 size, BodyType type = BodyType::DYNAMIC);
-    ~PhysicsRectangle() override;
     void Draw() override;
     void Update() override;
 

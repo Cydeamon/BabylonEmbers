@@ -2,6 +2,7 @@
 #include <iostream>
 #include <filesystem>
 #include <Game/Game.h>
+#include <stdexcept>
 
 int main()
 {

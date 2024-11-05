@@ -201,6 +201,27 @@ if os.path.exists("./Shaders/"):
     shutil.copytree("./Shaders/", deploy_folder + "/Shaders/")
     # shutil.copytree("./Shaders/", deploy_folder + "/Shaders/", ignore=ignore_shader_sources)
 
+# Archive source code
+source_code_ignore_directories = ["Bin", ".cache", "build", ".git", "Deploy"]
+
+for file in os.listdir(os.getcwd()):
+    ignore = False
+    for ignore_directory in source_code_ignore_directories:
+        if file.startswith(ignore_directory):
+            ignore = True
+            break
+    
+    if ignore:
+        continue
+
+    if os.path.isdir(file):
+        shutil.copytree(file, deploy_folder + "SourceFiles/" + file)
+    else:
+        shutil.copy(file, deploy_folder + "SourceFiles/" + file)
+
+if os.path.exists(deploy_folder + "SourceFiles"):
+    shutil.make_archive(deploy_folder + "SourceFiles", 'zip', deploy_folder + "SourceFiles")
+    shutil.rmtree(deploy_folder + "SourceFiles")
 
 # Open deploy folder in explorer
 if platform.system() == "Windows":

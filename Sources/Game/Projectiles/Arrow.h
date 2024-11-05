@@ -9,5 +9,7 @@ public:
     void Update() override;
     
 private: 
+    bool characterHit = false;
+
     void processCollisions();
 };

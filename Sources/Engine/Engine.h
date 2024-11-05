@@ -24,8 +24,12 @@ namespace Engine
     void ResortObjects();
     void SetDrawHUDCallback(std::function<void(void)> callback);
     void SetPhysFilterCategories(b2ShapeId shapeId, uint64_t filterCategories, uint64_t filterMask = 0);
+    void SetPaused(bool value);
+    GameObject* GetObjectByPhysShapeId(b2ShapeId id);
     std::map<GameObject*, Vector2> GetObjectsInRadius(float radius, Vector2 center);
+    std::vector<GameObject*> *GetGameObjects();
 
     // Physics
     b2WorldId GetPhysWorldID();
+    
 }

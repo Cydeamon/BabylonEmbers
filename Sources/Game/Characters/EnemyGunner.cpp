@@ -21,9 +21,7 @@ void EnemyGunner::Update()
     if (!dead)
     {
         if (Player::IsGrounded && Player::IsAlive)
-            moveDirection = { position.x < Player::Position.x ? 1 : -1, 0 };
-        else            
-            moveDirection = { position.x > (Engine::GetMousePositionScaled().x / 2) ? 1 : -1, 0 };
+            moveDirection = { position.x < Player::Position.x ? 1.0f : -1.0f, 0 };
 
         if (state != WAITING)
         {
@@ -69,7 +67,7 @@ void EnemyGunner::Update()
                 if (abs(velocity.x) < 20)
                     b2Body_SetLinearVelocity(physBodyId, {moveDirection.x * 25, moveDirection.y});
 
-                // If close enough to center, throw bomb
+                // If close enough to center - shoot
                 float distance = abs((Engine::GetInternalResolution().x / 2) - (position.x + (size.x / 2)));
                 bool onTheSameSide = (Player::Position.x < centerX && position.x < centerX) || (Player::Position.x > centerX && position.x > centerX);
 
@@ -107,7 +105,7 @@ void EnemyGunner::Update()
                 }
             }
             else
-                state = RUNNING;
+                state = WAITING;
         }
         else
         {
@@ -122,6 +120,6 @@ void EnemyGunner::Update()
 
 void EnemyGunner::shot()
 {
-    Vector2 bulletStartPos = {lookDirection.x > 0 ? position.x + 17 : position.x + 5, position.y + 10};
+    Vector2 bulletStartPos = {lookDirection.x > 0 ? position.x + 18 : position.x - 2, position.y + 10};
     new Bullet(bulletStartPos, lookDirection.x > 0);
 }

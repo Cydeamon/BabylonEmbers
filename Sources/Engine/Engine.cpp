@@ -1,8 +1,13 @@
 #include "Engine.h"
+#include "GameObjects/GameObject.h"
+#include "box2d/box2d.h"
+#include "box2d/id.h"
+#include "box2d/types.h"
+#include "raylib.h"
 #include <stdexcept>
 #include <vector>
 #include <iostream>
-#include <bits/stdc++.h>
+#include <algorithm>
 
 namespace Engine
 {    
@@ -32,13 +37,18 @@ namespace Engine
 
     // Callbacks    
     std::function<void(void)> DrawHUDCallback;
+    b2DebugDraw box2dDebugDraw = {0};
 
     /*******************************************************************************************/
     /***************************************  Functions  ***************************************/
     /*******************************************************************************************/
 
     void Init(Vector2 windowSize, Vector2 internalResolution)
-    {
+    {        
+        if (!IsDebug())
+            SetTraceLogLevel(TraceLogLevel::LOG_NONE);
+        
+
         // Init render and window
         if (internalResolution.x == 0 || internalResolution.y == 0)
             internalResolution = windowSize;
@@ -63,6 +73,9 @@ namespace Engine
         physWorldDef = b2DefaultWorldDef();
         physWorldDef.gravity = {0, 9.8 * 8};
         physWorldId = b2CreateWorld(&physWorldDef);
+
+        
+
     }
 
     void Deinit()
@@ -78,7 +91,7 @@ namespace Engine
 
     bool IsDebug()
     {
-        return true; // PROJECT_BUILD_TYPE == "Debug";
+        return PROJECT_BUILD_TYPE == "Debug";
     }
 
     void Draw()
@@ -89,9 +102,17 @@ namespace Engine
 
             BeginMode2D(worldSpaceCamera);
             {
+                // Draw physics shapes if debug
+                // if (IsDebug())
+                // {
+                //     b2World_Draw(physWorldId, box2dDebugDraw);
+                // }
+
+                // Draw game objects
                 for (int i = 0; i < gameObjects.size(); i++)
                     gameObjects[i]->Draw();
 
+                // Draw UI
                 if (DrawHUDCallback)
                     DrawHUDCallback();
                 
@@ -180,7 +201,7 @@ namespace Engine
                 if (obj->IsDestroyQueued())
                 {
                     delete obj;
-                    i = 0;
+                    i = -1;
                 }
                 else
                     obj->Update();
@@ -237,4 +258,28 @@ namespace Engine
         return physWorldId;
     }
     
+    std::vector<GameObject*> *GetGameObjects()
+    {
+        return &gameObjects;
+    }
+
+    GameObject* GetObjectByPhysShapeId(b2ShapeId id)
+    {
+        for (int i = 0; i < gameObjects.size(); i++)
+        {
+            for (b2ShapeId shapeId : *gameObjects[i]->GetPhysShapes())
+            {
+                
+                if (id.index1 == shapeId.index1 && id.world0 == shapeId.world0 && id.revision == shapeId.revision)
+                    return gameObjects[i];
+            }
+        }
+
+        return nullptr;
+    }
+    
+    void SetPaused(bool value)
+    {
+        isPaused = value;
+    }
 }

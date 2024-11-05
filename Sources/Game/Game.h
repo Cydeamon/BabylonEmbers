@@ -9,6 +9,7 @@
 #include "Characters/Enemy.h"
 #include <vector>
 
+
 class Game
 {
 public:
@@ -17,8 +18,9 @@ public:
 
 	const static int FloorHeight = 40;
 	const static int FloorY = 230;
+	static int EnemiesLeft;
+
 private:
-    std::vector<Brick *> bricks;
 	float brickHeightInPX = 8;
 	int towerHeightInBricks = 15;
 	float gapBetweenBricksInPX = 1;
@@ -29,12 +31,20 @@ private:
 	Font font;
 	TowerTop* towerTop = nullptr;
 	Player* player = nullptr;
-	double enemySpawnInterval = 1;
+	double enemySpawnIntervalInitial = 2;
+	double enemySpawnInterval = enemySpawnIntervalInitial;
 	double lastEnemySpawnTime = -1000;
+	bool gameOver = false;
+	int level = 1;
+	bool isLevelTransition = false;
+	float enemiesNumberScale = 1.5;
+	int level1EnemiesNum = 10;
+	int enemiesLeftToSpawn = level1EnemiesNum;
 
 	void prepareScene();
     void generateTower();
 	void showEndGameScreen();
 	void drawUI();
 	void spawnEnemy();
+	void clearLevel();
 };

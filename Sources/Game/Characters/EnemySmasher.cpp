@@ -19,9 +19,7 @@ void EnemySmasher::Update()
     if (!dead)
     {       
         if (Player::IsGrounded && Player::IsAlive)
-            moveDirection = { position.x < Player::Position.x ? 1 : -1, 0 };
-        else            
-            moveDirection = { position.x > (Engine::GetMousePositionScaled().x / 2) ? 1 : -1, 0 };
+            moveDirection = { position.x < Player::Position.x ? 1.0f : -1.0f, 0 };
 
         processCollisions();
 
@@ -51,7 +49,7 @@ void EnemySmasher::Update()
                     targetBrick->Damage();
                     wasAttacked = true;
 
-                    if (!targetBrick->GetHealth())
+                    if (targetBrick->GetHealth() <= 0)
                     {
                         state = RUNNING;
                         targetBrick = nullptr;
@@ -91,21 +89,21 @@ void EnemySmasher::processCollisions()
     if (GetTime() - waitTimeStart > waitTimeAfterDestroy)
     {
         int bodyContactCapacity = b2Body_GetContactCapacity(physBodyId);
-        b2ContactData contactData[bodyContactCapacity];
+        b2ContactData *contactData = new b2ContactData[bodyContactCapacity];
         int bodyContactCount = b2Body_GetContactData(physBodyId, contactData, bodyContactCapacity);
 
         for (int i = 0; i < bodyContactCapacity && i < bodyContactCount; i++)
         {
             b2ContactData* data = contactData + i;
-            void* contacts[2];
-            contacts[0] = b2Shape_GetUserData(data->shapeIdA);
-            contacts[1] = b2Shape_GetUserData(data->shapeIdB);
+            GameObject* contacts[2];
+            contacts[0] = Engine::GetObjectByPhysShapeId(data->shapeIdA);
+            contacts[1] = Engine::GetObjectByPhysShapeId(data->shapeIdB);
 
             for (int j = 0; j < 2; j++)
             {
                 if (contacts[j])
                 {
-                    GameObject* other = (GameObject*) contacts[j];
+                    GameObject* other = contacts[j];
                     Brick* otherBrick = dynamic_cast<Brick*>(other);
                     Player *player = dynamic_cast<Player*>(other);
                     

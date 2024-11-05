@@ -19,7 +19,7 @@ Arrow::Arrow(Vector2 initPosition, Vector2 size) : PhysicsRectangle(initPosition
 
     float arrowAngle = atan2(Engine::GetMousePositionScaled().y - initPosition.y, Engine::GetMousePositionScaled().x - initPosition.x);
     this->SetRotation(b2Rot{cos(arrowAngle), sin(arrowAngle)});
-    this->SetVelocity({500 * cos(arrowAngle), 500 * sin(arrowAngle)});
+    this->SetVelocity({350 * cos(arrowAngle), 350 * sin(arrowAngle)});
 }
 
 void Arrow::Update() 
@@ -31,32 +31,34 @@ void Arrow::Update()
 void Arrow::processCollisions()
 {
     int bodyContactCapacity = b2Body_GetContactCapacity(bodyId);
-    b2ContactData contactData[bodyContactCapacity];
+    b2ContactData *contactData = new b2ContactData[bodyContactCapacity];
     int bodyContactCount = b2Body_GetContactData(bodyId, contactData, bodyContactCapacity);
 
     for (int i = 0; i < bodyContactCapacity && i < bodyContactCount; i++)
     {
         b2ContactData* data = contactData + i;
-        void* contacts[2];
-        contacts[0] = b2Shape_GetUserData(data->shapeIdA);
-        contacts[1] = b2Shape_GetUserData(data->shapeIdB);
+        GameObject* contacts[2];
+        contacts[0] = Engine::GetObjectByPhysShapeId(data->shapeIdA);
+        contacts[1] = Engine::GetObjectByPhysShapeId(data->shapeIdB);
 
         for (int j = 0; j < 2; j++)
         {
             if (contacts[j])
             {
-                GameObject* other = (GameObject*) contacts[j];
-                Brick* brick = dynamic_cast<Brick*>(other);
-                Enemy* enemy = dynamic_cast<Enemy*>(other);
-                
-                if (brick)
-                    QueueDestroy();
-
-                if (enemy)
+                if (!characterHit)
                 {
-                    b2Vec2 hitDirection = {position.x - enemy->GetPosition().x, position.y - enemy->GetPosition().y};
-                    hitDirection = b2Normalize(hitDirection);
-                    enemy->Die({hitDirection.x, hitDirection.y}, 1000);
+                    GameObject* other = (GameObject*) contacts[j];
+                    Brick* brick = dynamic_cast<Brick*>(other);
+                    Enemy* enemy = dynamic_cast<Enemy*>(other);
+
+                    if (enemy)
+                    {
+                        b2Vec2 hitDirection = {(enemy->GetPosition().x + 8) - position.x, (enemy->GetPosition().y) - position.y + 8};
+                        hitDirection = b2Normalize(hitDirection);
+                        enemy->Die({hitDirection.x, hitDirection.y}, 1000);
+                        characterHit = true;
+                    }
+
                     QueueDestroy();
                 }
             }

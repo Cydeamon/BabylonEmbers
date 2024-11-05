@@ -14,7 +14,8 @@ Brick::Brick(Vector2 position, Vector2 size, float gap) : PhysicsRectangle(posit
         DEBRIS | TOWER_TOP | PLAYER | ENEMY | ARROW | GROUND | TOWER_BRICK | BODY | BOMB | MOLOTOV_PARTICLE
     );
 
-    b2Shape_SetUserData(shapeId, this);
+    physShapes.push_back(shapeId);
+    physBodies.push_back(bodyId);
 }
 
 void Brick::Update() 

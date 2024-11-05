@@ -21,7 +21,7 @@ Molotov::Molotov(Vector2 initPosition, Vector2 size) : PhysicsRectangle(initPosi
     if (!Player::IsGrounded)
         angleToPlayer -= (throwAngleCompensation * DEG2RAD) * (playerOnTheRight ? 1 : -1);
 
-    int maxForce = 350 - (50 - (rand() % 100));
+    float maxForce = 350 - (50 - (rand() % 100));
     b2Vec2 force = {maxForce, 0};
     force = b2RotateVector({cos(angleToPlayer), sin(angleToPlayer)}, force);
 
@@ -46,16 +46,16 @@ void Molotov::Update()
 
 void Molotov::processCollisions()
 {
-    int bodyContactCapacity = b2Body_GetContactCapacity(bodyId);
-    b2ContactData contactData[bodyContactCapacity];
+    const int bodyContactCapacity = b2Body_GetContactCapacity(bodyId);
+    b2ContactData *contactData = new b2ContactData[bodyContactCapacity];
     int bodyContactCount = b2Body_GetContactData(bodyId, contactData, bodyContactCapacity);
 
     for (int i = 0; i < bodyContactCapacity && i < bodyContactCount; i++)
     {
         b2ContactData* data = contactData + i;
-        void* contacts[2];
-        contacts[0] = b2Shape_GetUserData(data->shapeIdA);
-        contacts[1] = b2Shape_GetUserData(data->shapeIdB);
+        GameObject* contacts[2];
+        contacts[0] = Engine::GetObjectByPhysShapeId(data->shapeIdA);
+        contacts[1] = Engine::GetObjectByPhysShapeId(data->shapeIdB);
 
         for (int j = 0; j < 2; j++)
         {

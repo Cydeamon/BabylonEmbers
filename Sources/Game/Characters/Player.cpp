@@ -121,9 +121,9 @@ void Player::Draw()
     {
         DrawTexturePro(
             crossbowTexture,
-            {0, 0, crossbowTexture.width, crossbowTexture.height},
-            {position.x + 10, position.y + 9, crossbowTexture.width, crossbowTexture.height},
-            {lookDirection.x > 0 ? 1 : -3, 3},
+            {0, 0, (float) crossbowTexture.width, (float) crossbowTexture.height},
+            {position.x + 10, position.y + 9, (float) crossbowTexture.width, (float) crossbowTexture.height},
+            {lookDirection.x > 0 ? 1.0f : -3.0f, 3.0f},
             weaponAngle,
             WHITE
         );
@@ -138,8 +138,8 @@ void Player::shot()
 
 void Player::processCollisions()
 {
-    int bodyContactCapacity = b2Body_GetContactCapacity(physBodyId);
-    b2ContactData contactData[bodyContactCapacity];
+    const int bodyContactCapacity = b2Body_GetContactCapacity(physBodyId);
+    b2ContactData *contactData = new b2ContactData[bodyContactCapacity];
     int bodyContactCount = b2Body_GetContactData(physBodyId, contactData, bodyContactCapacity);
 
     for (int i = 0; i < bodyContactCapacity && i < bodyContactCount; i++)

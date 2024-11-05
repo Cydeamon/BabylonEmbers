@@ -11,7 +11,7 @@ Bomb::Bomb(Enemy* thrower, Vector2 lookDirection, Vector2 initPosition, Vector2 
     this->thrower = thrower;
     countStartTime = GetTime();
 
-    int maxForce = 100 + (rand() % 150);
+    float maxForce = 100 + (rand() % 150);
     b2Vec2 force = {maxForce, maxForce};
     // b2Vec2 force = {rand() % maxForce + 500, rand() % maxForce + 500};
     force = b2RotateVector({
@@ -37,7 +37,7 @@ Bomb::Bomb(Enemy* thrower, Vector2 initPosition, Vector2 size) : PhysicsRectangl
     countStartTime = GetTime();
 
     float angleToPlayer = atan2(Player::Position.y - position.y, Player::Position.x - position.x);    
-    int maxForce = 350 - (50 - (rand() % 100));
+    float maxForce = 350 - (50 - (rand() % 100));
     float xDistanceToPlayer = abs(Player::Position.x - position.x);
 
     if (Player::BelowThreshold)
@@ -73,16 +73,16 @@ void Bomb::Update()
 
 void Bomb::processCollisions()
 {
-    int bodyContactCapacity = b2Body_GetContactCapacity(bodyId);
-    b2ContactData contactData[bodyContactCapacity];
+    const int bodyContactCapacity = b2Body_GetContactCapacity(bodyId);
+    b2ContactData *contactData = new b2ContactData[bodyContactCapacity];
     int bodyContactCount = b2Body_GetContactData(bodyId, contactData, bodyContactCapacity);
 
     for (int i = 0; i < bodyContactCapacity && i < bodyContactCount; i++)
     {
         b2ContactData* data = contactData + i;
-        void* contacts[2];
-        contacts[0] = b2Shape_GetUserData(data->shapeIdA);
-        contacts[1] = b2Shape_GetUserData(data->shapeIdB);
+        GameObject* contacts[2];
+        contacts[0] = Engine::GetObjectByPhysShapeId(data->shapeIdA);
+        contacts[1] = Engine::GetObjectByPhysShapeId(data->shapeIdB);
 
         for (int j = 0; j < 2; j++)
         {

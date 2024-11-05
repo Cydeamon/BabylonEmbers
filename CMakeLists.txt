@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5.0)
-project(TowerDefender VERSION 0.3.3)
-set (CMAKE_CXX_STANDARD 17)
+project(TowerDefender VERSION 0.4.0)
+set (CMAKE_CXX_STANDARD 20)
 set (PROJECT_LABEL "Tower Defender")
 
 # Dependencies
@@ -35,6 +35,9 @@ add_executable(
     Sources/Config.h
     Sources/Engine/Engine.h
     Sources/Engine/Engine.cpp
+    Sources/Engine/Config/Config.cpp
+    Sources/Engine/Config/Config.h
+    Sources/Engine/Config/Category.h
     Sources/Engine/GameObjects/GameObject.h
     Sources/Engine/GameObjects/GameObject.cpp
     Sources/Engine/GameObjects/PhysicsRectangle.cpp
