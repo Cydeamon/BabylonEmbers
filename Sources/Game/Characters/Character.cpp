@@ -202,7 +202,7 @@ void Character::Die(Vector2 reactionDirection, float reactionForce, bool dismemb
 
         if (reactionDirection.x != 0 || reactionDirection.y != 0)
         {
-            bleedDirection = {reactionDirection.x, -reactionDirection.y};
+            bleedDirection = {-reactionDirection.x, reactionDirection.y};
             b2Vec2 dir = {bleedDirection.x, bleedDirection.y};
             dir = b2Normalize(dir);
             bleedDirection.x = dir.x;

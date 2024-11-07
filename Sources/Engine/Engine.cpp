@@ -19,7 +19,6 @@ namespace Engine
     bool isPaused = false;
     bool isInternalResolutionSet = false;
     Vector2 internalResolution = {0, 0};
-    Vector2 windowSize = {1280, 720};
     Vector2 mousePositionScaled = {0};
     float renderRatio;
     Camera2D worldSpaceCamera = {0};
@@ -27,6 +26,7 @@ namespace Engine
     RenderTexture2D target = {0};
     Rectangle sourceRec = {0};
     Rectangle destRec = {0};
+    bool fullscreen = true;
 
     // Game objects
     std::vector<GameObject*> gameObjects;
@@ -43,21 +43,18 @@ namespace Engine
     /***************************************  Functions  ***************************************/
     /*******************************************************************************************/
 
-    void Init(Vector2 windowSize, Vector2 internalResolution)
+    void Init(Vector2 internalResolution)
     {        
         if (!IsDebug())
             SetTraceLogLevel(TraceLogLevel::LOG_NONE);
-        
 
         // Init render and window
-        if (internalResolution.x == 0 || internalResolution.y == 0)
-            internalResolution = windowSize;
-        else
-            isInternalResolutionSet = true;
-
-        Engine::windowSize = windowSize;
+        isInternalResolutionSet = true;
         std::string title = std::string(PROJECT_LABEL) + " " + std::string(PROJECT_VER);
-        InitWindow(windowSize.x, windowSize.y, title.c_str());
+
+        
+        int curMonitor = GetCurrentMonitor();
+        InitWindow(GetMonitorWidth(curMonitor), GetMonitorHeight(curMonitor), title.c_str());
         SetTargetFPS(60);
         SetInternalResolution(internalResolution);
 
@@ -74,8 +71,8 @@ namespace Engine
         physWorldDef.gravity = {0, 9.8 * 8};
         physWorldId = b2CreateWorld(&physWorldDef);
 
-        
-
+        // Set fullscreen as default
+        ToggleBorderlessWindowed();
     }
 
     void Deinit()
@@ -144,7 +141,7 @@ namespace Engine
         renderRatio = internalResolution.x / internalResolution.y;
         target = LoadRenderTexture(internalResolution.x, internalResolution.y);
         sourceRec = { 0.0f, 0.0f, (float)target.texture.width, -(float)target.texture.height };
-        destRec = { -renderRatio, -renderRatio, windowSize.x + (renderRatio*2), windowSize.y + (renderRatio*2) };
+        destRec = { -renderRatio, -renderRatio, GetScreenWidth() + (renderRatio*2), GetScreenHeight() + (renderRatio*2) };
     }
     
     void RegisterGameObject(GameObject* obj)
@@ -169,9 +166,6 @@ namespace Engine
 
     Vector2 GetInternalResolution()
     {
-        if (!isInternalResolutionSet)
-            return windowSize;
-
         return internalResolution;
     }
 
@@ -184,8 +178,8 @@ namespace Engine
     {
         // Update mouse position scaled        
         mousePositionScaled = GetMousePosition();
-        mousePositionScaled.x /= windowSize.x / internalResolution.x;
-        mousePositionScaled.y /= windowSize.y / internalResolution.y;
+        mousePositionScaled.x /= GetScreenWidth() / internalResolution.x;
+        mousePositionScaled.y /= GetScreenHeight() / internalResolution.y;
         mousePositionScaled.x = (int) mousePositionScaled.x;
         mousePositionScaled.y = (int) mousePositionScaled.y;
 
@@ -206,6 +200,29 @@ namespace Engine
                 else
                     obj->Update();
             }
+        }
+
+        // Toggle fullscreen
+        if (IsKeyPressed(KEY_F11))
+        {
+            int curMonitor = GetCurrentMonitor();
+
+            if (fullscreen)
+            {
+                Vector2 winSize = {(float) GetMonitorWidth(curMonitor) / 2, (float) GetMonitorHeight(curMonitor) / 2};
+                ToggleBorderlessWindowed();
+                SetWindowSize(winSize.x, winSize.y);
+                SetWindowPosition(winSize.x / 2, winSize.y / 2);
+            }
+            else
+            { 
+                SetWindowSize(GetMonitorWidth(curMonitor), GetMonitorHeight(curMonitor));
+                SetWindowPosition(0, 50);
+                ToggleBorderlessWindowed();
+            }
+
+            fullscreen = !fullscreen;
+            SetInternalResolution(internalResolution);
         }
     }
 

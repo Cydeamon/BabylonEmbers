@@ -15,9 +15,10 @@ int Game::EnemiesLeft = 0;
 
 Game::Game()
 {
-    Engine::Init({1600, 900}, {480, 270});
+    Engine::Init({480, 270});
     font = LoadFont("Assets/Fonts/PressStart2P-Regular.ttf");
     Engine::SetDrawHUDCallback(std::bind(&Game::drawUI, this));
+    startGameTexture = LoadTexture("Assets/StartScreen.png");
 
     EnemiesLeft = level1EnemiesNum;
 }
@@ -30,49 +31,60 @@ void Game::Run()
     {   
         // Update 
         Engine::Update();
+        
+        if (gameIsStarted)
+        {            
+            Engine::SetPaused(false);
 
-        if (Player::IsAlive)
-        {
-            if (enemiesLeftToSpawn && GetTime() - lastEnemySpawnTime > enemySpawnInterval)
-                spawnEnemy();
-
-            if (EnemiesLeft <= 0)
-                isLevelTransition = true; 
-
-            if (isLevelTransition && IsKeyPressed(KEY_ENTER))
+            if (Player::IsAlive)
             {
-                clearLevel();
-                generateTower();
+                if (enemiesLeftToSpawn && GetTime() - lastEnemySpawnTime > enemySpawnInterval)
+                    spawnEnemy();
 
-                level++;
-                EnemiesLeft = level1EnemiesNum * level * enemiesNumberScale;
-                enemiesLeftToSpawn = EnemiesLeft;
-                enemySpawnInterval = enemySpawnIntervalInitial / (level / 1.5);
-                isLevelTransition = false;
+                if (EnemiesLeft <= 0)
+                    isLevelTransition = true; 
+
+                if (isLevelTransition && IsKeyPressed(KEY_ENTER))
+                {
+                    clearLevel();
+                    generateTower();
+
+                    level++;
+                    EnemiesLeft = level1EnemiesNum * level * enemiesNumberScale;
+                    enemiesLeftToSpawn = EnemiesLeft;
+                    enemySpawnInterval = enemySpawnIntervalInitial / (level / 1.5);
+                    isLevelTransition = false;
+                }
+            }
+            else
+            {
+                if (!gameOver)
+                {
+                    isLevelTransition = false;
+                    gameOver = true;
+                }
+            }
+            
+            if (gameOver)
+            {
+                if (IsKeyPressed(KEY_R))
+                {
+                    clearLevel();
+                    generateTower();
+                    level = 1;
+                    EnemiesLeft = level1EnemiesNum;
+                    enemiesLeftToSpawn = EnemiesLeft;
+                    enemySpawnInterval = enemySpawnIntervalInitial;
+                    gameOver = false;
+                    Player::IsAlive = true;
+                }
             }
         }
         else
         {
-            if (!gameOver)
-            {
-                isLevelTransition = false;
-                gameOver = true;
-            }
-        }
-        
-        if (gameOver)
-        {
-            if (IsKeyPressed(KEY_R))
-            {
-                clearLevel();
-                generateTower();
-                level = 1;
-                EnemiesLeft = level1EnemiesNum;
-                enemiesLeftToSpawn = EnemiesLeft;
-                enemySpawnInterval = enemySpawnIntervalInitial;
-                gameOver = false;
-                Player::IsAlive = true;
-            }
+            Engine::SetPaused(true);
+            if (IsKeyPressed(KEY_ENTER))
+                gameIsStarted = true;
         }
 
         // Draw
@@ -168,50 +180,87 @@ void Game::generateTower()
 void Game::showEndGameScreen()
 {
     float centerX = Engine::GetInternalResolution().x / 2;
+    int bgHeight = 5;
+    int bgY = Engine::GetInternalResolution().y / 2 - 50;
         
     std::string msg = "YOU DIED";
-    int msgWidth = MeasureTextEx(font, msg.c_str(), 40, 0).x;
-    DrawTextEx(font, msg.c_str(), {centerX - (msgWidth / 2), Engine::GetInternalResolution().y / 2 - 50}, 40, 0, BLACK);
+    Vector2 line1size = MeasureTextEx(font, msg.c_str(), 40, 0);
+    bgHeight += line1size.y + messagesPadding;
 
     char restartMsg[64];
     sprintf(restartMsg, "PRESS [R] TO RESTART");
-    msgWidth = MeasureTextEx(font, restartMsg, 16, 0).x;
-    DrawTextEx(font, restartMsg, {centerX - (msgWidth / 2), Engine::GetInternalResolution().y / 2}, 16, 0, BLACK);
+    Vector2 line2size = MeasureTextEx(font, restartMsg, 16, 0);
+    bgHeight += line2size.y + messagesPadding;
+
+    drawUIBackground(bgY - messagesPadding, bgHeight);
+    DrawTextEx(font, msg.c_str(), {centerX - (line1size.x / 2), Engine::GetInternalResolution().y / 2 - 50}, 40, 0, BLACK);
+    DrawTextEx(font, restartMsg, {centerX - (line2size.x / 2), Engine::GetInternalResolution().y / 2}, 16, 0, BLACK);
 }
 
 void Game::drawUI()
 {
-    if (isLevelTransition)
+    if (gameIsStarted)
     {
-        float centerX = Engine::GetInternalResolution().x / 2;
-        
-        char levelMsg[64];
-        sprintf(levelMsg, "LEVEL %d COMPLETE", 1);
-        int msgWidth = MeasureTextEx(font, levelMsg, 16, 0).x;
-        DrawTextEx(font, levelMsg, {centerX - (msgWidth / 2), 5}, 16, 0, BLACK);
-        
-        char continueMsg[64];
-        sprintf(continueMsg, "PRESS [ENTER] TO CONTINUE...", 1);
-        msgWidth = MeasureTextEx(font, continueMsg, 16, 0).x;
-        DrawTextEx(font, continueMsg, {centerX - (msgWidth / 2), 25}, 16, 0, BLACK);
+        if (isLevelTransition)
+        {
+            float centerX = Engine::GetInternalResolution().x / 2;
+            int bgHeight = 5;
+            int bgY = 100;
+            
+            char levelMsg[64];
+            sprintf(levelMsg, "LEVEL %d COMPLETE", level);
+            Vector2 line1size = MeasureTextEx(font, levelMsg, 16, 0);
+            bgHeight += line1size.y + messagesPadding;
+
+            char continueMsg[64];
+            sprintf(continueMsg, "PRESS [ENTER] TO CONTINUE...", 1);
+            Vector2 line2size = MeasureTextEx(font, continueMsg, 16, 0);
+            bgHeight += line2size.y + messagesPadding;
+            
+            drawUIBackground(bgY - messagesPadding, bgHeight);
+            DrawTextEx(font, levelMsg, {centerX - (line1size.x / 2), 100}, 16, 0, BLACK);
+            DrawTextEx(font, continueMsg, {centerX - (line2size.x / 2), 125}, 16, 0, BLACK);
+        }
+        else
+        if (gameOver)
+            showEndGameScreen();
+        else
+        {
+            char levelMsg[64];
+            sprintf(levelMsg, "LEVEL: %d", level);
+
+            char EnemiesLeftMsg[64];
+            sprintf(EnemiesLeftMsg, "ENEMIES: %d", EnemiesLeft);
+
+            char rateMsg[64];
+            sprintf(rateMsg, "SPAWN RATE: %fs", enemySpawnInterval);
+
+            int bgHeight = 5 + 15 + 25 + (messagesPadding * 2);
+            int bgY = 5;
+
+            DrawTextEx(font, levelMsg, {5, 5}, 8, 0, BLACK);
+            DrawTextEx(font, EnemiesLeftMsg, {5, 15}, 8, 0, BLACK);
+            DrawTextEx(font, rateMsg, {5, 25}, 8, 0, BLACK);
+        }
     }
     else
-    if (gameOver)
-        showEndGameScreen();
-    else
     {
-        char levelMsg[64];
-        sprintf(levelMsg, "LEVEL: %d", level);
-        DrawTextEx(font, levelMsg, {5, 5}, 8, 0, BLACK);
-
-        char EnemiesLeftMsg[64];
-        sprintf(EnemiesLeftMsg, "ENEMIES: %d", EnemiesLeft);
-        DrawTextEx(font, EnemiesLeftMsg, {5, 15}, 8, 0, BLACK);
-
-        char rateMsg[64];
-        sprintf(rateMsg, "SPAWN RATE: %fs", enemySpawnInterval);
-        DrawTextEx(font, rateMsg, {5, 25}, 8, 0, BLACK);
+        DrawTexture(startGameTexture, 0, 0, WHITE);
     }
+}
+
+void Game::drawUIBackground(int bgY, int bgHeight)
+{
+    // Draw white border box
+    DrawLine(0, bgY - 2, Engine::GetInternalResolution().x, bgY - 2, WHITE);
+    DrawLine(0, bgY + bgHeight + 1, Engine::GetInternalResolution().x, bgY + bgHeight + 1, WHITE);
+
+    // Draw black border box
+    DrawLine(0, bgY - 1, Engine::GetInternalResolution().x, bgY - 1, BLACK);
+    DrawLine(0, bgY + bgHeight, Engine::GetInternalResolution().x, bgY + bgHeight, BLACK);
+
+    // Draw white background box
+    DrawRectangle(0, bgY, Engine::GetInternalResolution().x, bgHeight, WHITE);
 }
 
 void Game::spawnEnemy()

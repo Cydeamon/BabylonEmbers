@@ -1,15 +1,15 @@
 #include <windows.h>
 
-#define APP_VERSION "0.4.0"
-#define APP_NAME "Tower Defender"
+#define APP_VERSION "1.0.2"
+#define APP_NAME "Babylon Embers"
 #define APP_AUTHOR "Cydeamon"
 #define BUILD_TYPE "Release"
-#define DESCRIPTION "Tower Defender 0.4.0. Release version"
+#define DESCRIPTION "Babylon Embers 1.0.2. Release version"
 #define IDI_ICON1 101
 
 VS_VERSION_INFO VERSIONINFO
-FILEVERSION     0,4,0
-PRODUCTVERSION  0,4,0
+FILEVERSION     1,0,2
+PRODUCTVERSION  1,0,2
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN

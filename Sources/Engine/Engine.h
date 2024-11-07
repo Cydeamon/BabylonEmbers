@@ -10,7 +10,7 @@
 
 namespace Engine
 {    
-    void Init(Vector2 windowSize, Vector2 internalResolution = {0, 0});
+    void Init(Vector2 internalResolution = {0, 0});
     void Deinit();
     bool IsRunning();
     bool IsDebug();

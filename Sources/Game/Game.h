@@ -21,6 +21,7 @@ public:
 	static int EnemiesLeft;
 
 private:
+	Texture startGameTexture = {0};
 	float brickHeightInPX = 8;
 	int towerHeightInBricks = 15;
 	float gapBetweenBricksInPX = 1;
@@ -37,14 +38,17 @@ private:
 	bool gameOver = false;
 	int level = 1;
 	bool isLevelTransition = false;
-	float enemiesNumberScale = 1.5;
+	bool gameIsStarted = false;
+	float enemiesNumberScale = 1.1;
 	int level1EnemiesNum = 10;
 	int enemiesLeftToSpawn = level1EnemiesNum;
+	int messagesPadding = 5;
 
 	void prepareScene();
     void generateTower();
 	void showEndGameScreen();
 	void drawUI();
+	void drawUIBackground(int bgY, int bgHeight);
 	void spawnEnemy();
 	void clearLevel();
 };
