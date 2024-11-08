@@ -88,7 +88,7 @@ namespace Engine
 
     bool IsDebug()
     {
-        return PROJECT_BUILD_TYPE == "Debug";
+        return false;//PROJECT_BUILD_TYPE == "Debug";
     }
 
     void Draw()

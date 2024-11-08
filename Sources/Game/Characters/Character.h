@@ -6,6 +6,7 @@ class Character : public GameObject
 {
 public:
     Character();
+    ~Character();
     void Update() override;
     void Draw() override;
     bool IsDead() { return dead; }

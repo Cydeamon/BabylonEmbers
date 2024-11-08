@@ -38,42 +38,48 @@ void Brick::Destroy(Vector2 reactionDirection)
     int piecesX;
     int piecesY = (size.y / pieceSize) / ((rand() % 3) + 1);
     
-    for (int y = 0; y < size.y; y += (size.y / piecesY))
+    if (piecesY)
     {
-        pieceSize = (rand() % 2) + 1;
-        piecesX = (size.x / pieceSize) / ((rand() % 3) + 1);
-
-        for (int x = 0; x < size.x; x += (size.x / piecesX))
+        for (int y = 0; y < size.y; y += (size.y / piecesY))
         {
-            PhysicsRectangle *piece = new PhysicsRectangle(
-                {position.x + x, position.y + y}, 
-                {(float) pieceSize, (float) pieceSize}, 
-                PhysicsRectangle::BodyType::DYNAMIC
-            );
+            pieceSize = (rand() % 2) + 1;
+            piecesX = (size.x / pieceSize) / ((rand() % 3) + 1);
 
-            int maxForce = 200 * pieceSize;
-            float forceX = (rand() % maxForce * 2) - maxForce;
-            float forceY = (rand() % maxForce * 2) - maxForce;
-
-            if (reactionDirection.x != 0 || reactionDirection.y != 0)
+            if (piecesX)
             {
-                forceX = reactionDirection.x * maxForce;
-                forceY = reactionDirection.y * maxForce;
+                for (int x = 0; x < size.x; x += (size.x / piecesX))
+                {
+                    PhysicsRectangle *piece = new PhysicsRectangle(
+                        {position.x + x, position.y + y}, 
+                        {(float) pieceSize, (float) pieceSize}, 
+                        PhysicsRectangle::BodyType::DYNAMIC
+                    );
+
+                    int maxForce = 200 * pieceSize;
+                    float forceX = (rand() % maxForce * 2) - maxForce;
+                    float forceY = (rand() % maxForce * 2) - maxForce;
+
+                    if (reactionDirection.x != 0 || reactionDirection.y != 0)
+                    {
+                        forceX = reactionDirection.x * maxForce;
+                        forceY = reactionDirection.y * maxForce;
+                    }
+
+                    b2Shape_SetDensity(piece->GetShapeId(), 100);
+                    piece->SetColor(BLACK);
+                    b2Shape_SetUserData(piece->GetShapeId(), piece);
+
+                    Engine::SetPhysFilterCategories(
+                        piece->GetShapeId(),
+                        DEBRIS,
+                        GROUND | TOWER_BRICK | TOWER_TOP | 
+                        BODY | BOMB
+                    );
+                    b2Body_ApplyLinearImpulse(piece->GetBodyId(), {forceX, forceY}, b2Body_GetWorldCenterOfMass(piece->GetBodyId()), true);
+                }
             }
-
-            b2Shape_SetDensity(piece->GetShapeId(), 100);
-            piece->SetColor(BLACK);
-            b2Shape_SetUserData(piece->GetShapeId(), piece);
-
-            Engine::SetPhysFilterCategories(
-                piece->GetShapeId(),
-                DEBRIS,
-                GROUND | TOWER_BRICK | TOWER_TOP | 
-                BODY | BOMB
-            );
-            b2Body_ApplyLinearImpulse(piece->GetBodyId(), {forceX, forceY}, b2Body_GetWorldCenterOfMass(piece->GetBodyId()), true);
-        }
-    }            
+        }            
+    }
 
     QueueDestroy();
 }

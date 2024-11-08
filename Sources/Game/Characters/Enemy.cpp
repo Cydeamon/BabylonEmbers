@@ -1,5 +1,6 @@
 #include "Enemy.h"
 #include "Character.h"
+#include "raylib.h"
 #include <iostream>
 #include <Game/PhysicsCategory.h>
 #include <Game/Game.h>

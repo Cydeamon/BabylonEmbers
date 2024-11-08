@@ -29,62 +29,66 @@ void Game::Run()
 
     while (Engine::IsRunning())
     {   
-        // Update 
-        Engine::Update();
-        
-        if (gameIsStarted)
-        {            
-            Engine::SetPaused(false);
+        if (IsWindowFocused() && !IsWindowMinimized() && IsWindowReady())
+        {
+            // Update 
+            Engine::Update();
+            
+            if (gameIsStarted)
+            {            
+                Engine::SetPaused(false);
 
-            if (Player::IsAlive)
-            {
-                if (enemiesLeftToSpawn && GetTime() - lastEnemySpawnTime > enemySpawnInterval)
-                    spawnEnemy();
-
-                if (EnemiesLeft <= 0)
-                    isLevelTransition = true; 
-
-                if (isLevelTransition && IsKeyPressed(KEY_ENTER))
+                if (Player::IsAlive)
                 {
-                    clearLevel();
-                    generateTower();
+                    if (enemiesLeftToSpawn && GetTime() - lastEnemySpawnTime > enemySpawnInterval)
+                        spawnEnemy();
 
-                    level++;
-                    EnemiesLeft = level1EnemiesNum * level * enemiesNumberScale;
-                    enemiesLeftToSpawn = EnemiesLeft;
-                    enemySpawnInterval = enemySpawnIntervalInitial / (level / 1.5);
-                    isLevelTransition = false;
+                    if (EnemiesLeft <= 0)
+                        isLevelTransition = true; 
+
+                    if (isLevelTransition && IsKeyPressed(KEY_ENTER))
+                    {
+                        clearLevel();
+                        generateTower();
+
+                        level++;
+                        EnemiesLeft = level1EnemiesNum * level * enemiesNumberScale;
+                        enemiesLeftToSpawn = EnemiesLeft;
+                        enemySpawnInterval = enemySpawnIntervalInitial / (level / 1.5);
+                        isLevelTransition = false;
+                    }
+                }
+                else
+                {
+                    if (!gameOver)
+                    {
+                        isLevelTransition = false;
+                        gameOver = true;
+                    }
+                }
+                
+                if (gameOver)
+                {
+                    if (IsKeyPressed(KEY_R))
+                    {
+                        clearLevel();
+                        generateTower();
+                        level = 1;
+                        EnemiesLeft = level1EnemiesNum;
+                        enemiesLeftToSpawn = EnemiesLeft;
+                        enemySpawnInterval = enemySpawnIntervalInitial;
+                        gameOver = false;
+                        Player::IsAlive = true;
+                    }
                 }
             }
             else
             {
-                if (!gameOver)
-                {
-                    isLevelTransition = false;
-                    gameOver = true;
-                }
+                Engine::SetPaused(true);
+                if (IsKeyPressed(KEY_ENTER))
+                    gameIsStarted = true;
             }
-            
-            if (gameOver)
-            {
-                if (IsKeyPressed(KEY_R))
-                {
-                    clearLevel();
-                    generateTower();
-                    level = 1;
-                    EnemiesLeft = level1EnemiesNum;
-                    enemiesLeftToSpawn = EnemiesLeft;
-                    enemySpawnInterval = enemySpawnIntervalInitial;
-                    gameOver = false;
-                    Player::IsAlive = true;
-                }
-            }
-        }
-        else
-        {
-            Engine::SetPaused(true);
-            if (IsKeyPressed(KEY_ENTER))
-                gameIsStarted = true;
+
         }
 
         // Draw

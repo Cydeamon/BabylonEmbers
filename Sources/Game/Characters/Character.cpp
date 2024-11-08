@@ -1,6 +1,7 @@
 #include "Character.h"
 #include "Player.h"
 #include "box2d/box2d.h"
+#include "raylib.h"
 #include <iostream>
 #include <Engine/GameObjects/PhysicsRectangle.h>
 #include <Game/PhysicsCategory.h>
@@ -15,6 +16,13 @@ Character::Character()
     initPhysicsBody();
     SetDrawPriority(LOW);
     bloodParticlesLeft = rand() % 50 + rand() % 50;
+}
+
+Character::~Character()
+{
+    UnloadTexture(ragdollHeadTexture);
+    UnloadTexture(ragdollBodyTexture);
+    UnloadTexture(ragdollLegsTexture);
 }
 
 void Character::Update()
@@ -212,6 +220,12 @@ void Character::Die(Vector2 reactionDirection, float reactionForce, bool dismemb
         
         createRagdollBodies(reactionDirection, reactionForce, dismember);
         DestroyPhysBody(physBodyId);
+
+        if (currentTexture)
+        {
+            UnloadTexture(*currentTexture);
+            currentTexture = nullptr;
+        }
     }
 }
 
