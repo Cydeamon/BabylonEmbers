@@ -56,7 +56,7 @@ protected:
     b2Vec2 ragdollLegsExtent = {0};
     uint64_t filterCategories = 0;
     uint64_t filterMask = 0;
-    double destroyTime = 15;
+    double destroyTime = 5;
     double destroyTimeStart = 0;
     Vector2 bleedDirection = {0};
     bool bleedDirectionIsSet = false;

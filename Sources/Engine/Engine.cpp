@@ -188,7 +188,7 @@ namespace Engine
         // Update game objects if game is not paused
         if (!isPaused)
         {
-            b2World_Step(physWorldId, GetFrameTime(), 4);
+            b2World_Step(physWorldId, 1.0f / 60.0f, 4);
         
             for (int i = 0; i < gameObjects.size(); i++)
             {

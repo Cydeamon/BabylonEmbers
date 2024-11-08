@@ -43,7 +43,7 @@ void Game::Run()
                     if (enemiesLeftToSpawn && GetTime() - lastEnemySpawnTime > enemySpawnInterval)
                         spawnEnemy();
 
-                    if (EnemiesLeft <= 0)
+                    if (EnemiesLeft <= 0) 
                         isLevelTransition = true; 
 
                     if (isLevelTransition && IsKeyPressed(KEY_ENTER))
@@ -54,7 +54,7 @@ void Game::Run()
                         level++;
                         EnemiesLeft = level1EnemiesNum * level * enemiesNumberScale;
                         enemiesLeftToSpawn = EnemiesLeft;
-                        enemySpawnInterval = enemySpawnIntervalInitial / (level / 1.5);
+                        enemySpawnInterval = enemySpawnIntervalInitial / (level / 1.995);
                         isLevelTransition = false;
                     }
                 }

@@ -39,7 +39,7 @@ private:
 	int level = 1;
 	bool isLevelTransition = false;
 	bool gameIsStarted = false;
-	float enemiesNumberScale = 1.1;
+	float enemiesNumberScale = 0.75;
 	int level1EnemiesNum = 10;
 	int enemiesLeftToSpawn = level1EnemiesNum;
 	int messagesPadding = 5;
