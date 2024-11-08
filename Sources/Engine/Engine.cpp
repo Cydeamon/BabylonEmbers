@@ -8,6 +8,7 @@
 #include <vector>
 #include <iostream>
 #include <algorithm>
+#include <map>
 
 namespace Engine
 {    
@@ -27,6 +28,7 @@ namespace Engine
     Rectangle sourceRec = {0};
     Rectangle destRec = {0};
     bool fullscreen = true;
+    std::map<std::string, Texture> textures;
 
     // Game objects
     std::vector<GameObject*> gameObjects;
@@ -298,5 +300,32 @@ namespace Engine
     void SetPaused(bool value)
     {
         isPaused = value;
+    }
+
+    Texture LoadTextureFromTexturePool(std::string path)
+    {
+        for (auto it : textures)
+        {
+            if (it.first == path)
+                return it.second;
+        }
+
+        Texture texture = LoadTexture(path.c_str());
+        textures[path] = texture;
+        
+        return texture;
+    }
+
+    void UnloadTexture(int id)
+    {
+        for (auto it : textures)
+        {
+            if (it.second.id == id)
+            {
+                UnloadTexture(it.second);
+                textures.erase(it.first);
+                break;
+            }
+        }
     }
 }

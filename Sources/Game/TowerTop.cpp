@@ -3,7 +3,7 @@
 
 TowerTop::TowerTop()
 {
-    towerTopTexture = LoadTexture("Assets/TowerTop.png");
+    towerTopTexture = Engine::LoadTextureFromTexturePool("Assets/TowerTop.png");
     initPhysicsBody();    
 }
 

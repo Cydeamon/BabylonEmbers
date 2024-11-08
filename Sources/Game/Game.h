@@ -51,4 +51,5 @@ private:
 	void drawUIBackground(int bgY, int bgHeight);
 	void spawnEnemy();
 	void clearLevel();
+	void loadAllTextures();
 };

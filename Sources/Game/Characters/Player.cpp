@@ -12,9 +12,9 @@ bool Player::BelowThreshold = false;
 
 Player::Player() : Character()
 {
-    spritesheetTextureIdle = LoadTexture("Assets/PlayerIdle.png");
-    spritesheetTextureRunning = LoadTexture("Assets/PlayerRun.png");
-    crossbowTexture = LoadTexture("Assets/Crossbow.png");
+    spritesheetTextureIdle = Engine::LoadTextureFromTexturePool("Assets/PlayerIdle.png");
+    spritesheetTextureRunning = Engine::LoadTextureFromTexturePool("Assets/PlayerRun.png");
+    crossbowTexture = Engine::LoadTextureFromTexturePool("Assets/Crossbow.png");
     
     // Setup physics filters
     filterCategories = GamePhysicsCategories::PLAYER;

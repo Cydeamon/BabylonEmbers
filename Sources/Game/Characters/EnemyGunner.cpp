@@ -7,10 +7,10 @@
 
 EnemyGunner::EnemyGunner() : Enemy()
 {
-    spritesheetTextureAttack = LoadTexture("Assets/EnemyGunnerAttack.png");
-    spritesheetTextureAttackStart = LoadTexture("Assets/EnemyGunnerAttackStart.png");
-    spritesheetTextureAttackEnd = LoadTexture("Assets/EnemyGunnerAttackEnd.png");
-    spritesheetTextureRunning = LoadTexture("Assets/EnemyGunnerRun.png");
+    spritesheetTextureAttack = Engine::LoadTextureFromTexturePool("Assets/EnemyGunnerAttack.png");
+    spritesheetTextureAttackStart = Engine::LoadTextureFromTexturePool("Assets/EnemyGunnerAttackStart.png");
+    spritesheetTextureAttackEnd = Engine::LoadTextureFromTexturePool("Assets/EnemyGunnerAttackEnd.png");
+    spritesheetTextureRunning = Engine::LoadTextureFromTexturePool("Assets/EnemyGunnerRun.png");
     b2Shape_SetUserData(physShapeId, this);
 }
 

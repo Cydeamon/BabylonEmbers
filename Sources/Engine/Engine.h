@@ -7,6 +7,7 @@
 #include <vector>
 #include <map>
 #include <functional>
+#include <string>
 
 namespace Engine
 {    
@@ -25,6 +26,7 @@ namespace Engine
     void SetDrawHUDCallback(std::function<void(void)> callback);
     void SetPhysFilterCategories(b2ShapeId shapeId, uint64_t filterCategories, uint64_t filterMask = 0);
     void SetPaused(bool value);
+    Texture LoadTextureFromTexturePool(std::string path);
     GameObject* GetObjectByPhysShapeId(b2ShapeId id);
     std::map<GameObject*, Vector2> GetObjectsInRadius(float radius, Vector2 center);
     std::vector<GameObject*> *GetGameObjects();

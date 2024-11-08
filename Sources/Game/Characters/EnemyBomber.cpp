@@ -7,8 +7,8 @@
 
 EnemyBomber::EnemyBomber() : Enemy()
 {
-    spritesheetTextureAttack = LoadTexture("Assets/EnemyBomberAttack.png");
-    spritesheetTextureRunning = LoadTexture("Assets/EnemyBomberRun.png");
+    spritesheetTextureAttack = Engine::LoadTextureFromTexturePool("Assets/EnemyBomberAttack.png");
+    spritesheetTextureRunning = Engine::LoadTextureFromTexturePool("Assets/EnemyBomberRun.png");
     b2Shape_SetUserData(physShapeId, this);
 }
 

@@ -1,15 +1,14 @@
 #include "Game.h"
 #include <stdlib.h>
-#include <iostream>
 #include "Engine/Engine.h"
 #include "PhysicsCategory.h"
 #include "Characters/EnemySmasher.h"
 #include "Characters/EnemyBomber.h"
 #include "Characters/EnemyGunner.h"
 #include "Characters/EnemyMolotov.h"
-#include "Projectiles/Molotov.h"
 #include "box2d/box2d.h"
 #include "raylib.h"
+#include <filesystem>
 
 int Game::EnemiesLeft = 0;
 
@@ -18,9 +17,10 @@ Game::Game()
     Engine::Init({480, 270});
     font = LoadFont("Assets/Fonts/PressStart2P-Regular.ttf");
     Engine::SetDrawHUDCallback(std::bind(&Game::drawUI, this));
-    startGameTexture = LoadTexture("Assets/StartScreen.png");
-
+    startGameTexture = Engine::LoadTextureFromTexturePool("Assets/StartScreen.png");
     EnemiesLeft = level1EnemiesNum;
+
+    loadAllTextures();
 }
 
 void Game::Run()
@@ -281,4 +281,15 @@ void Game::spawnEnemy()
 
     lastEnemySpawnTime = GetTime();
     enemiesLeftToSpawn--;
+}
+
+void Game::loadAllTextures()
+{
+    std::string texturesPath = "Assets/";
+    
+    for (const auto & entry : std::filesystem::directory_iterator(texturesPath))
+    {
+        if (entry.is_regular_file() && entry.path().extension() == ".png")
+            Engine::LoadTextureFromTexturePool(entry.path().string());
+    }
 }

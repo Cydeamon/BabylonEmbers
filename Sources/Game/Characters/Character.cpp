@@ -8,9 +8,9 @@
 
 Character::Character()
 {
-    ragdollHeadTexture = LoadTexture("Assets/CharacterRagDollHead.png");
-    ragdollBodyTexture = LoadTexture("Assets/CharacterRagDollBody.png");
-    ragdollLegsTexture = LoadTexture("Assets/CharacterRagDollLegs.png");
+    ragdollHeadTexture = Engine::LoadTextureFromTexturePool("Assets/CharacterRagDollHead.png");
+    ragdollBodyTexture = Engine::LoadTextureFromTexturePool("Assets/CharacterRagDollBody.png");
+    ragdollLegsTexture = Engine::LoadTextureFromTexturePool("Assets/CharacterRagDollLegs.png");
     lastFrameTime = GetTime();
 
     initPhysicsBody();
@@ -20,9 +20,6 @@ Character::Character()
 
 Character::~Character()
 {
-    UnloadTexture(ragdollHeadTexture);
-    UnloadTexture(ragdollBodyTexture);
-    UnloadTexture(ragdollLegsTexture);
 }
 
 void Character::Update()
@@ -220,12 +217,6 @@ void Character::Die(Vector2 reactionDirection, float reactionForce, bool dismemb
         
         createRagdollBodies(reactionDirection, reactionForce, dismember);
         DestroyPhysBody(physBodyId);
-
-        if (currentTexture)
-        {
-            UnloadTexture(*currentTexture);
-            currentTexture = nullptr;
-        }
     }
 }
 
