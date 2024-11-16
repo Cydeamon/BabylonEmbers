@@ -24,4 +24,5 @@ private:
     
     void initPhysicsBody();    
     b2ShapeId attachPhysShapeToBody(b2BodyId bodyId, std::vector<b2Vec2> vertices, float density = 1.5f, float friction = 5.0f);
+    void processCollisions();
 };

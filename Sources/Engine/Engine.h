@@ -11,6 +11,8 @@
 
 namespace Engine
 {    
+    enum SoundPlayMode { ONCE, LOOP, LOOP_UNIQUE };
+
     void Init(Vector2 internalResolution = {0, 0});
     void Deinit();
     bool IsRunning();
@@ -28,6 +30,10 @@ namespace Engine
     void SetPaused(bool value);
     Texture LoadTextureFromTexturePool(std::string path);
     GameObject* GetObjectByPhysShapeId(b2ShapeId id);
+    Sound GetAudio(std::string soundName);
+    void PlayAudio(std::string soundName, SoundPlayMode playMode = ONCE, float volume = 1.0f, float pitch = 1.0f);
+    void StopAudio(std::string soundName);
+    void LoadAudioFile(std::string path);
     std::map<GameObject*, Vector2> GetObjectsInRadius(float radius, Vector2 center);
     std::vector<GameObject*> *GetGameObjects();
 

@@ -7,8 +7,8 @@
 
 EnemySmasher::EnemySmasher() : Enemy()
 {
-    spritesheetTextureAttack = Engine::LoadTextureFromTexturePool("Assets/EnemySmasherAttack.png");
-    spritesheetTextureRunning = Engine::LoadTextureFromTexturePool("Assets/EnemySmasherRun.png");
+    spritesheetTextureAttack = Engine::LoadTextureFromTexturePool("Assets/Textures/EnemySmasherAttack.png");
+    spritesheetTextureRunning = Engine::LoadTextureFromTexturePool("Assets/Textures/EnemySmasherRun.png");
     b2Shape_SetUserData(physShapeId, this);
 }
 
@@ -35,8 +35,15 @@ void EnemySmasher::Update()
             lookDirection = {moveDirection.x, moveDirection.y};
 
             // Move in direction
-            if (state == RUNNING)    
+            if (state == RUNNING)
+            {
+                playStepsSounds = true;
                 b2Body_SetLinearVelocity(physBodyId, {moveDirection.x * 50, moveDirection.y});
+            }
+            else
+            {
+                playStepsSounds = false;
+            }
 
             // If attacking, apply damage to the brick
             if (state == ATTACK)
@@ -46,6 +53,7 @@ void EnemySmasher::Update()
 
                 if (curFrame == 8 && !wasAttacked && targetBrick)
                 {
+                    Engine::PlayAudio("BrickSmasherHit");
                     targetBrick->Damage();
                     wasAttacked = true;
 

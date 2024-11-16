@@ -1,4 +1,5 @@
 #include "Brick.h"
+#include "Game/Characters/Character.h"
 #include <iostream>
 #include <Engine/Engine.h>
 #include <Game/PhysicsCategory.h>
@@ -30,6 +31,8 @@ void Brick::Update()
                 Destroy();
         }
     }
+
+    processCollisions();
 }
 
 void Brick::Destroy(Vector2 reactionDirection)
@@ -67,7 +70,9 @@ void Brick::Destroy(Vector2 reactionDirection)
 
                     b2Shape_SetDensity(piece->GetShapeId(), 100);
                     piece->SetColor(BLACK);
+                    piece->SetSoundOnCollision("BrickDebrisFall");
                     b2Shape_SetUserData(piece->GetShapeId(), piece);
+
 
                     Engine::SetPhysFilterCategories(
                         piece->GetShapeId(),
@@ -82,6 +87,7 @@ void Brick::Destroy(Vector2 reactionDirection)
     }
 
     QueueDestroy();
+    Engine::PlayAudio("BrickBreak");
 }
 
 void Brick::Damage(Vector2 reactionDirection)
@@ -94,5 +100,44 @@ void Brick::Damage(Vector2 reactionDirection)
     if (reactionDirection.x != 0 || reactionDirection.y != 0)
     {        
         b2Body_ApplyLinearImpulseToCenter(GetBodyId(), {reactionDirection.x * 1000, reactionDirection.y * 1000}, true);
+    }
+}
+
+void Brick::processCollisions()
+{
+    const int bodyContactCapacity = b2Body_GetContactCapacity(bodyId);
+    b2ContactData *contactData = new b2ContactData[bodyContactCapacity];
+    int bodyContactCount = b2Body_GetContactData(bodyId, contactData, bodyContactCapacity);
+
+    for (int i = 0; i < bodyContactCapacity && i < bodyContactCount; i++)
+    {        
+        b2ContactData* data = contactData + i;
+
+        if (!b2Shape_IsValid(data->shapeIdA) || !b2Shape_IsValid(data->shapeIdB))
+            continue;
+
+        GameObject* contacts[2];
+        contacts[0] = Engine::GetObjectByPhysShapeId(data->shapeIdA);
+        contacts[1] = Engine::GetObjectByPhysShapeId(data->shapeIdB);
+
+        for (int j = 0; j < 2; j++)
+        {
+            if (contacts[j])
+            {
+                GameObject* other = (GameObject*) contacts[j];
+                Character* character = dynamic_cast<Character*>(other);
+
+                if (character)
+                {                    
+                    for (int k = 0; k < data->manifold.pointCount; k++)
+                    {
+                        b2ManifoldPoint point = data->manifold.points[k];
+                        
+                        if (point.normalImpulse > 50)
+                            character->Die({point.anchorA.x, point.anchorA.y}, point.normalImpulse);
+                    }
+                }
+            }
+        }
     }
 }

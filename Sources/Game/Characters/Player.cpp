@@ -1,6 +1,10 @@
 #include "Player.h"
+#include "Game/Brick.h"
+#include "Game/TowerTop.h"
 #include "box2d/box2d.h"
+#include "box2d/math_functions.h"
 #include "box2d/types.h"
+#include "raylib.h"
 #include <Game/PhysicsCategory.h>
 #include <Game/Projectiles/Arrow.h>
 #include <iostream>
@@ -12,9 +16,10 @@ bool Player::BelowThreshold = false;
 
 Player::Player() : Character()
 {
-    spritesheetTextureIdle = Engine::LoadTextureFromTexturePool("Assets/PlayerIdle.png");
-    spritesheetTextureRunning = Engine::LoadTextureFromTexturePool("Assets/PlayerRun.png");
-    crossbowTexture = Engine::LoadTextureFromTexturePool("Assets/Crossbow.png");
+    spritesheetTextureIdle = Engine::LoadTextureFromTexturePool("Assets/Textures/PlayerIdle.png");
+    spritesheetTextureRunning = Engine::LoadTextureFromTexturePool("Assets/Textures/PlayerRun.png");
+    crossbowTexture = Engine::LoadTextureFromTexturePool("Assets/Textures/Crossbow.png");
+    isPlayer = true;
     
     // Setup physics filters
     filterCategories = GamePhysicsCategories::PLAYER;
@@ -78,6 +83,16 @@ void Player::Update()
                 shot();
                 lastShotTime = GetTime();
             }
+        }
+
+        // Handle audio
+        if (state == RUNNING)
+        {
+            playStepsSounds = true;
+        }
+        else
+        {
+            playStepsSounds = false;
         }
 
         // Rotate weapon
@@ -145,6 +160,10 @@ void Player::processCollisions()
     for (int i = 0; i < bodyContactCapacity && i < bodyContactCount; i++)
     {
         b2ContactData* data = contactData + i;
+
+        if (!b2Shape_IsValid(data->shapeIdA) || !b2Shape_IsValid(data->shapeIdB))
+            continue;
+
         b2Filter filter1 = b2Shape_GetFilter(data->shapeIdA);
         b2Filter filter2 = b2Shape_GetFilter(data->shapeIdB);
         

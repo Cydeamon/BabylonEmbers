@@ -12,5 +12,6 @@ public:
     int GetHealth() { return health; }
     
 private: 
+    void processCollisions();
     int health = 3;    
 };

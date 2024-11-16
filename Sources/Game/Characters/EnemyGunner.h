@@ -27,6 +27,7 @@ private:
     double lastShotTime = 0;
     double shootingTime = 2.5;
     double attackStartTime = 0;
+    int stopX;
 
     static float raycastResultCallback(b2ShapeId shapeId, b2Vec2 point, b2Vec2 normal, float fraction, void *context);
     void shot();

@@ -34,6 +34,8 @@ Bullet::Bullet(Vector2 initPosition, bool xPositive, Vector2 size) : PhysicsRect
     this->SetRotation(b2Rot{cos(bulletAngle), sin(bulletAngle)});
     this->SetVelocity({300 * cos(bulletAngle), 300 * sin(bulletAngle)});
     this->SetColor(BLACK);
+
+    Engine::PlayAudio("GunShot");
 }
 
 void Bullet::Update() 
@@ -63,13 +65,21 @@ void Bullet::processCollisions()
                 Character* character = dynamic_cast<Character*>(contacts[j]);
                 
                 if (brick)
+                {
+                    Engine::PlayAudio("BulletHitEnv");
                     brick->Damage();
-                    
+                }
+                else
                 if (character)
                 {
                     b2Vec2 hitDirection = {(character->GetPosition().x + 8) - position.x, (character->GetPosition().y) - position.y + 8};
                     hitDirection = b2Normalize(hitDirection);
-                    character->Die({hitDirection.x, hitDirection.y}, 1000, true);
+                    character->Die({-hitDirection.x, hitDirection.y}, 1000, true);
+                    Engine::PlayAudio("BulletHitCharacter");
+                }
+                else
+                {
+                    Engine::PlayAudio("BulletHitEnv");
                 }
                 
                 QueueDestroy();

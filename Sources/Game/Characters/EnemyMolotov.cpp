@@ -7,9 +7,10 @@
 
 EnemyMolotov::EnemyMolotov() : Enemy()
 {
-    spritesheetTextureAttack = Engine::LoadTextureFromTexturePool("Assets/EnemyMolotovAttack.png");
-    spritesheetTextureRunning = Engine::LoadTextureFromTexturePool("Assets/EnemyMolotovRun.png");
+    spritesheetTextureAttack = Engine::LoadTextureFromTexturePool("Assets/Textures/EnemyMolotovAttack.png");
+    spritesheetTextureRunning = Engine::LoadTextureFromTexturePool("Assets/Textures/EnemyMolotovRun.png");
     b2Shape_SetUserData(physShapeId, this);
+    stopX = 150 + (rand() % 30) - 15;
 }
 
 void EnemyMolotov::Update()
@@ -33,6 +34,8 @@ void EnemyMolotov::Update()
 
         if (state == RUNNING)    
         {
+            playStepsSounds = true;
+
             // Move in direction
             b2Vec2 velocity = b2Body_GetLinearVelocity(physBodyId);
 
@@ -42,8 +45,12 @@ void EnemyMolotov::Update()
             // If close enough to center, throw bomb
             float distanceToCenter = abs((Engine::GetInternalResolution().x / 2) - (position.x + (size.x / 2)));
 
-            if (distanceToCenter < 150)
+            if (distanceToCenter < stopX)
                 state = EnemyMolotov::ATTACK;
+        }
+        else
+        {
+            playStepsSounds = false;
         }
 
         if (GetTime() - waitTimeStart > waitTimeAfterThrow)

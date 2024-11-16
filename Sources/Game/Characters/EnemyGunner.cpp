@@ -7,11 +7,12 @@
 
 EnemyGunner::EnemyGunner() : Enemy()
 {
-    spritesheetTextureAttack = Engine::LoadTextureFromTexturePool("Assets/EnemyGunnerAttack.png");
-    spritesheetTextureAttackStart = Engine::LoadTextureFromTexturePool("Assets/EnemyGunnerAttackStart.png");
-    spritesheetTextureAttackEnd = Engine::LoadTextureFromTexturePool("Assets/EnemyGunnerAttackEnd.png");
-    spritesheetTextureRunning = Engine::LoadTextureFromTexturePool("Assets/EnemyGunnerRun.png");
+    spritesheetTextureAttack = Engine::LoadTextureFromTexturePool("Assets/Textures/EnemyGunnerAttack.png");
+    spritesheetTextureAttackStart = Engine::LoadTextureFromTexturePool("Assets/Textures/EnemyGunnerAttackStart.png");
+    spritesheetTextureAttackEnd = Engine::LoadTextureFromTexturePool("Assets/Textures/EnemyGunnerAttackEnd.png");
+    spritesheetTextureRunning = Engine::LoadTextureFromTexturePool("Assets/Textures/EnemyGunnerRun.png");
     b2Shape_SetUserData(physShapeId, this);
+    stopX = 200 - (rand() % 50);
 }
 
 void EnemyGunner::Update()
@@ -60,6 +61,8 @@ void EnemyGunner::Update()
 
             if (state == RUNNING)    
             {
+                playStepsSounds = true;
+
                 // Move in direction
                 b2Vec2 velocity = b2Body_GetLinearVelocity(physBodyId);
                 int centerX = Engine::GetInternalResolution().x / 2;
@@ -75,12 +78,16 @@ void EnemyGunner::Update()
                     distance = abs(Player::Position.x - position.x);
 
 
-                if (Player::BelowThreshold && onTheSameSide ? distance < 100 : distance < 200)
+                if (Player::BelowThreshold && onTheSameSide ? distance < 100 : distance < stopX)
                 {
                     state = EnemyGunner::ATTACK_START;
                     attackStartTime = GetTime();
                 }
             } 
+            else
+            {
+                playStepsSounds = false;
+            }
 
             if (GetTime() - waitTimeStart > cooldownTime)
             {   

@@ -1,4 +1,5 @@
 #include "Game.h"
+#include <iostream>
 #include <stdlib.h>
 #include "Engine/Engine.h"
 #include "PhysicsCategory.h"
@@ -17,89 +18,104 @@ Game::Game()
     Engine::Init({480, 270});
     font = LoadFont("Assets/Fonts/PressStart2P-Regular.ttf");
     Engine::SetDrawHUDCallback(std::bind(&Game::drawUI, this));
-    startGameTexture = Engine::LoadTextureFromTexturePool("Assets/StartScreen.png");
+    startGameTexture = Engine::LoadTextureFromTexturePool("Assets/Textures/StartScreen.png");
     EnemiesLeft = level1EnemiesNum;
 
     loadAllTextures();
+    loadAllSounds();
+
+    Engine::PlayAudio("Menu", Engine::LOOP, musicVolume);
 }
 
 void Game::Run()
 {
-    prepareScene();
-
     while (Engine::IsRunning())
     {   
-        if (IsWindowFocused() && !IsWindowMinimized() && IsWindowReady())
-        {
-            // Update 
-            Engine::Update();
+        // Update 
+        Engine::Update();
+        Engine::Draw();
+        
+        if (gameIsStarted)
+        {            
+            Engine::SetPaused(false);
             
-            if (gameIsStarted)
-            {            
-                Engine::SetPaused(false);
+            if (Player::IsAlive)
+            {
+                if (enemiesLeftToSpawn && GetTime() - lastEnemySpawnTime > enemySpawnInterval)
+                    spawnEnemy();
 
-                if (Player::IsAlive)
+                if (EnemiesLeft <= 0 && !isLevelTransition) 
                 {
-                    if (enemiesLeftToSpawn && GetTime() - lastEnemySpawnTime > enemySpawnInterval)
-                        spawnEnemy();
-
-                    if (EnemiesLeft <= 0) 
-                        isLevelTransition = true; 
-
-                    if (isLevelTransition && IsKeyPressed(KEY_ENTER))
-                    {
-                        clearLevel();
-                        generateTower();
-
-                        level++;
-                        EnemiesLeft = level1EnemiesNum * level * enemiesNumberScale;
-                        enemiesLeftToSpawn = EnemiesLeft;
-                        enemySpawnInterval = enemySpawnIntervalInitial / (level / 1.995);
-                        isLevelTransition = false;
-                    }
+                    Engine::StopAudio("Gameplay");
+                    Engine::PlayAudio("WinFanfare", Engine::ONCE, musicVolume);
+                    isLevelTransition = true; 
                 }
-                else
+
+                if (isLevelTransition && IsKeyPressed(KEY_ENTER))
                 {
-                    if (!gameOver)
-                    {
-                        isLevelTransition = false;
-                        gameOver = true;
-                    }
-                }
-                
-                if (gameOver)
-                {
-                    if (IsKeyPressed(KEY_R))
-                    {
-                        clearLevel();
-                        generateTower();
-                        level = 1;
-                        EnemiesLeft = level1EnemiesNum;
-                        enemiesLeftToSpawn = EnemiesLeft;
-                        enemySpawnInterval = enemySpawnIntervalInitial;
-                        gameOver = false;
-                        Player::IsAlive = true;
-                    }
+                    
+                    clearLevel();
+                    generateTower();
+
+                    level++;
+                    EnemiesLeft = level1EnemiesNum * level * enemiesNumberScale;
+                    enemiesLeftToSpawn = EnemiesLeft;
+                    enemySpawnInterval = enemySpawnIntervalInitial / ((level + 1) / 1.995);
+                    isLevelTransition = false;
+
+                    Engine::PlayAudio("Gameplay", Engine::LOOP, musicVolume);
+                    Engine::StopAudio("WinFanfare");
+                    Engine::StopAudio("LoseFanfare");
                 }
             }
             else
             {
-                Engine::SetPaused(true);
-                if (IsKeyPressed(KEY_ENTER))
-                    gameIsStarted = true;
+                if (!gameOver)
+                {
+                    isLevelTransition = false;
+                    gameOver = true;
+
+                    Engine::StopAudio("Gameplay");
+                    Engine::PlayAudio("LoseFanfare", Engine::ONCE, musicVolume);
+                }
             }
+            
+            if (gameOver)
+            {
+                if (IsKeyPressed(KEY_R))
+                {                        
+                    clearLevel();
+                    generateTower();
+                    level = 1;
+                    EnemiesLeft = level1EnemiesNum;
+                    enemiesLeftToSpawn = EnemiesLeft;
+                    enemySpawnInterval = enemySpawnIntervalInitial;
+                    gameOver = false;
+                    Player::IsAlive = true;
 
+                    Engine::StopAudio("LoseFanfare");
+                    Engine::PlayAudio("Gameplay", Engine::LOOP, musicVolume);
+                }
+            }
         }
-
-        // Draw
-        Engine::Draw();
+        else
+        {
+            Engine::SetPaused(true);
+            if (IsKeyPressed(KEY_ENTER))
+            {
+                prepareScene();
+                gameIsStarted = true;
+                Engine::StopAudio("Menu");
+                Engine::PlayAudio("Gameplay", Engine::LOOP, musicVolume);
+            }
+        }
     }
 
     Engine::Deinit();
 }
 
 void Game::clearLevel()
-{
+{    
     player->QueueDestroy();
 
     std::vector<GameObject*> *gameObjects = Engine::GetGameObjects();
@@ -169,15 +185,17 @@ void Game::generateTower()
     }
 
     towerTop = new TowerTop();
-    towerTop->SetPosition({
-        1 + (Engine::GetInternalResolution().x / 2) - (towerTop->GetSize().x / 2), 
-        towerTopRowY - towerTop->GetSize().y - gapBetweenBricksInPX
-    });
+    Vector2 towerTopPos = {
+        1 + (Engine::GetInternalResolution().x / 2), 
+        towerTopRowY - (towerTop->GetSize().y / 2)
+    };
+
+    towerTop->SetPosition(towerTopPos);
 
     player = new Player();
     player->SetPosition({
         (Engine::GetInternalResolution().x / 2) - (player->GetSize().x / 2), 
-        towerTopRowY - player->GetSize().y - 10.0f
+        towerTopRowY - player->GetSize().y - 3.0f
     });
 }
 
@@ -285,11 +303,25 @@ void Game::spawnEnemy()
 
 void Game::loadAllTextures()
 {
-    std::string texturesPath = "Assets/";
+    std::string texturesPath = "Assets/Textures/";
     
     for (const auto & entry : std::filesystem::directory_iterator(texturesPath))
     {
         if (entry.is_regular_file() && entry.path().extension() == ".png")
             Engine::LoadTextureFromTexturePool(entry.path().string());
+    }
+}
+
+void Game::loadAllSounds()
+{
+    std::vector<std::string> soundsPaths = {"Assets/Sounds/", "Assets/Music/"};
+    
+    for (const auto & soundsPath : soundsPaths)
+    {
+        for (const auto & entry : std::filesystem::directory_iterator(soundsPath))
+        {
+            if (entry.is_regular_file() && entry.path().extension() == ".wav")
+                Engine::LoadAudioFile(entry.path().string());
+        }
     }
 }

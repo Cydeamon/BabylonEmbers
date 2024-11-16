@@ -32,7 +32,7 @@ private:
 	Font font;
 	TowerTop* towerTop = nullptr;
 	Player* player = nullptr;
-	double enemySpawnIntervalInitial = 2;
+	double enemySpawnIntervalInitial = 3;
 	double enemySpawnInterval = enemySpawnIntervalInitial;
 	double lastEnemySpawnTime = -1000;
 	bool gameOver = false;
@@ -40,9 +40,10 @@ private:
 	bool isLevelTransition = false;
 	bool gameIsStarted = false;
 	float enemiesNumberScale = 0.75;
-	int level1EnemiesNum = 10;
+	int level1EnemiesNum = 8;
 	int enemiesLeftToSpawn = level1EnemiesNum;
 	int messagesPadding = 5;
+	float musicVolume = 0.75f;
 
 	void prepareScene();
     void generateTower();
@@ -52,4 +53,5 @@ private:
 	void spawnEnemy();
 	void clearLevel();
 	void loadAllTextures();
+	void loadAllSounds();
 };

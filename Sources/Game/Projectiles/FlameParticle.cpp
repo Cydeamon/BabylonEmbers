@@ -1,8 +1,11 @@
 #include "FlameParticle.h"
+#include "Engine/Engine.h"
+#include "Engine/GameObjects/PhysicsRectangle.h"
 #include <math.h>
 #include <Game/PhysicsCategory.h>
 #include <Game/Characters/Player.h>
 #include <Game/Characters/Enemy.h>
+#include <iostream>
 
 FlameParticle::FlameParticle(Vector2 pos, float angle) : PhysicsRectangle(pos, {1, 1})
 {    
@@ -24,6 +27,13 @@ FlameParticle::FlameParticle(Vector2 pos, float angle) : PhysicsRectangle(pos, {
     nextSmokeTime = GetTime() + (((rand() % (int) smokeIntervalMax * 100) / 100.0f) + smokeIntervalMin);
 
     SetLifeTime(rand() % 5 + rand() % 5);
+    Engine::PlayAudio("FlameAir", Engine::LOOP_UNIQUE, 0.5f);
+}
+
+FlameParticle::~FlameParticle()
+{
+    Engine::StopAudio("Flame");
+    Engine::StopAudio("FlameAir");
 }
 
 void FlameParticle::Update()
@@ -48,6 +58,20 @@ void FlameParticle::Update()
     }
 
     PhysicsRectangle::Update();
+    handleAudio();
+    prevIsColliding = isColliding;
+}
+
+void FlameParticle::handleAudio()
+{
+    if (prevIsColliding != isColliding)
+    {
+        if (isColliding)
+        {
+            Engine::StopAudio("FlameAir");
+            Engine::PlayAudio("Flame", Engine::LOOP_UNIQUE, 0.5f);
+        }
+    }
 }
 
 void FlameParticle::processCollisions()
@@ -55,7 +79,8 @@ void FlameParticle::processCollisions()
     int bodyContactCapacity = b2Body_GetContactCapacity(bodyId);
     b2ContactData* contactData = new b2ContactData[bodyContactCapacity];
     int bodyContactCount = b2Body_GetContactData(bodyId, contactData, bodyContactCapacity);
-
+    isColliding = isColliding || bodyContactCount > 0;
+    
     for (int i = 0; i < bodyContactCapacity && i < bodyContactCount; i++)
     {
         b2ContactData* data = contactData + i;
@@ -76,6 +101,17 @@ void FlameParticle::processCollisions()
                 else 
                 if (enemy)
                     enemy->Die();
+
+                if (player || enemy)
+                {
+                    Engine::PlayAudio("Scream");
+                    
+                    if (player)
+                        player->StopBleeding();
+
+                    if (enemy)
+                        enemy->StopBleeding();
+                }
             }
         }        
     }

@@ -19,6 +19,7 @@ private:
     bool attacked = false;
     double waitTimeAfterThrow = 5.0f;
     double waitTimeStart = 0;
+    int stopX;
 
     static float raycastResultCallback(b2ShapeId shapeId, b2Vec2 point, b2Vec2 normal, float fraction, void *context);
 

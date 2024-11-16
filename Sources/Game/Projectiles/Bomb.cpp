@@ -57,6 +57,7 @@ Bomb::Bomb(Enemy* thrower, Vector2 initPosition, Vector2 size) : PhysicsRectangl
     );
 
     b2Body_ApplyLinearImpulseToCenter(bodyId, force, true);
+
 }
 
 void Bomb::Update() 
@@ -122,4 +123,6 @@ void Bomb::explode()
         if (enemy)
             enemy->Die(relativeToCenter, 250, true);
     }
+
+    Engine::PlayAudio("Explosion");
 }

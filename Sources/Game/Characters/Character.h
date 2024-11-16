@@ -15,6 +15,7 @@ public:
     Vector2 GetSize() { return size; }
     void SetPosition(Vector2 pos) override;
     void SetAnimationTexture(Texture2D *texture);
+    void StopBleeding() { bloodParticlesLeft = 0; }
     virtual void Die(Vector2 reactionDirection = {0}, float reactionForce = 25, bool dismember = false);
 
 protected:
@@ -28,6 +29,7 @@ protected:
     b2Vec2 extent;
     float speed = 50;
     bool dead = false;
+    bool isPlayer = false;
     double frameDuration = 1.0f / 24.0f;
     double lastFrameTime;
     int prevFrame = 0;
@@ -40,9 +42,25 @@ protected:
     int curTextureCols;
     b2Vec2 moveDirection = {0};
     b2Vec2 lookDirection = {1, 0};
+
+    // Bleeding
     int bloodParticlesLeft;
     double bleedInterval = 1.0f / 12.0f;
     double lastBleedTime = 0;
+
+    bool useBleedingBursts;
+    double bleedBurstsIntervalMin = 0.5;
+    double bleedBurstsIntervalMax = 2;
+    double bleedBurstsIntervalCur;
+    int bleedBurstMinBloodParticles = 5;
+    int bleedBurstMaxBloodParticles = 10;
+    int bleedBurstCurParticlesLeft = 0;
+    double lastBleedBurstTime = 0;
+
+    // Sounds setup
+    bool playStepsSounds = false;
+    float stepsInterval = 0.35f;
+    double lastStepTime = 0;
 
     // Ragdoll parts
     b2BodyId ragdollHeadId;
@@ -56,7 +74,7 @@ protected:
     b2Vec2 ragdollLegsExtent = {0};
     uint64_t filterCategories = 0;
     uint64_t filterMask = 0;
-    double destroyTime = 5;
+    double destroyTime = 10;
     double destroyTimeStart = 0;
     Vector2 bleedDirection = {0};
     bool bleedDirectionIsSet = false;
@@ -64,4 +82,6 @@ protected:
     void initPhysicsBody();
     void createRagdollBodies(Vector2 reactionDirection = {0}, float reactionForce = 25, bool dismember = false);
     void dropBloodParticle();
+    void handleAudio();
+    void randomizeBleedBurstsValues();
 };

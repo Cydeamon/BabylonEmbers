@@ -4,6 +4,7 @@
 #include "box2d/id.h"
 #include "box2d/types.h"
 #include "raylib.h"
+// #include "raudio.c"
 #include <stdexcept>
 #include <vector>
 #include <iostream>
@@ -29,6 +30,9 @@ namespace Engine
     Rectangle destRec = {0};
     bool fullscreen = true;
     std::map<std::string, Texture> textures;
+    std::map<std::string, Sound> sounds;
+    std::map<std::string, int> uniqueLoopSoundsCounter;
+    std::vector<std::string> soundsOnLoop;
 
     // Game objects
     std::vector<GameObject*> gameObjects;
@@ -68,6 +72,10 @@ namespace Engine
         SetWindowIcon(icon);
         UnloadImage(icon);
 
+        // Init audio
+        InitAudioDevice();
+        SetMasterVolume(0.8f);
+
         // Init physics
         physWorldDef = b2DefaultWorldDef();
         physWorldDef.gravity = {0, 9.8 * 8};
@@ -101,15 +109,12 @@ namespace Engine
 
             BeginMode2D(worldSpaceCamera);
             {
-                // Draw physics shapes if debug
-                // if (IsDebug())
-                // {
-                //     b2World_Draw(physWorldId, box2dDebugDraw);
-                // }
-
                 // Draw game objects
                 for (int i = 0; i < gameObjects.size(); i++)
-                    gameObjects[i]->Draw();
+                {
+                    if (!gameObjects[i]->IsDestroyQueued())
+                        gameObjects[i]->Draw();
+                }
 
                 // Draw UI
                 if (DrawHUDCallback)
@@ -226,6 +231,15 @@ namespace Engine
             fullscreen = !fullscreen;
             SetInternalResolution(internalResolution);
         }
+
+        // Update looping sounds playback
+        for (int i = 0; i < soundsOnLoop.size(); i++)
+        {
+            Sound sound = GetAudio(soundsOnLoop[i]);
+
+            if (!IsSoundPlaying(sound))
+                PlaySound(sound);
+        }
     }
 
     bool compareGameObjects(GameObject* obj1, GameObject* obj2)
@@ -327,5 +341,140 @@ namespace Engine
                 break;
             }
         }
+    }
+
+    void increaseUniqueLoopSoundCounter(std::string soundName)
+    {
+        // + 1 if value is set
+        for (auto& counter : uniqueLoopSoundsCounter)
+        {
+            if (counter.first == soundName)
+            {
+                counter.second++;
+                return;
+            }
+        }
+
+        // Set to 1 if value is not set
+        uniqueLoopSoundsCounter[soundName] = 1;
+    }
+
+    void decreaseUniqueLoopSoundCounter(std::string soundName)
+    {
+        int i = 0; 
+
+        for (auto& counter : uniqueLoopSoundsCounter)
+        {
+            i++;
+
+            if (counter.first == soundName)
+            {
+                counter.second--;
+
+                if (counter.second == 0)
+                    uniqueLoopSoundsCounter.erase(soundName);
+
+                return;
+            }
+        }
+    }
+    
+    void PlayAudio(std::string soundName, SoundPlayMode playMode, float volume, float pitch)
+    {
+        Sound sound = GetAudio(soundName);
+        SetSoundVolume(sound, volume);
+        SetSoundPitch(sound, pitch);
+
+        if (playMode == LOOP)
+        {
+            soundsOnLoop.push_back(soundName);
+            PlaySound(sound);
+        }
+        else if (playMode == LOOP_UNIQUE)
+        {
+            // If LOOP_UNIQUE push it to queue if it is not already there
+            bool isFound = false;
+
+            for (int i = 0; i < soundsOnLoop.size(); i++)
+            {
+                if (soundsOnLoop[i] == soundName)
+                {
+                    isFound = true;
+                    break;
+                }
+            }
+
+            if (!isFound)
+            {
+                soundsOnLoop.push_back(soundName);
+                PlaySound(sound);
+            }
+            else
+            {
+                increaseUniqueLoopSoundCounter(soundName);
+            }
+        }
+        else
+        {
+            PlaySound(sound);
+        }
+    }
+
+    void StopAudio(std::string soundName)
+    {
+        Sound sound = GetAudio(soundName);
+
+        // If is not in loop - just stop it
+        if (std::find(soundsOnLoop.begin(), soundsOnLoop.end(), soundName) == soundsOnLoop.end())
+        {
+            StopSound(sound);
+            return;
+        }
+
+        // Remove from sounds on loop
+        for (int i = 0; i < soundsOnLoop.size(); i++)
+        {
+            // Decrease unique loop sound counter
+            if (uniqueLoopSoundsCounter.find(soundName) != uniqueLoopSoundsCounter.end())
+                decreaseUniqueLoopSoundCounter(soundName);
+
+            // Try to find again, because it might have been removed by previous call
+            // If value exists - it means that we still have requests for this unique loop, so we don't remove
+            if (uniqueLoopSoundsCounter.find(soundName) != uniqueLoopSoundsCounter.end())
+            {
+                 continue;
+            }
+            else
+            {
+                // Remove from queue and stop
+                if (soundsOnLoop[i] == soundName)
+                {
+                    soundsOnLoop.erase(soundsOnLoop.begin() + i);
+                    StopSound(sound);
+                    break;
+                }
+            }
+        }
+    }
+
+    Sound GetAudio(std::string soundName)
+    {
+        for (auto it : sounds)
+        {
+            if (it.first == soundName)
+                return it.second;
+        }
+
+        throw std::runtime_error("Engine::GetAudio - Sound \"" + soundName + "\" not found!");
+    }
+    
+    void LoadAudioFile(std::string path)
+    {
+        if (!FileExists(path.c_str()))
+            throw std::runtime_error("Engine::LoadAudioFile - File \"" + path + "\" not found!");
+
+        std::string soundName = GetFileNameWithoutExt(path.c_str());
+        Sound sound = LoadSound(path.c_str());
+        sounds[soundName] = sound;
     }
 }

@@ -43,17 +43,26 @@ void PhysicsRectangle::Draw()
 
 void PhysicsRectangle::Update()
 {    
-    b2Vec2 pos = b2Body_GetWorldPoint(bodyId, { -extent.x, -extent.y });
-    position = {pos.x, pos.y};
-
-    if (bodyType != STATIC)
+    if (b2Body_IsValid(bodyId))
     {
-        if (position.x < 0 || position.x > Engine::GetInternalResolution().x || position.y < 0 || position.y > Engine::GetInternalResolution().y)
-            QueueDestroy();
-    }
+        b2Vec2 pos = b2Body_GetWorldPoint(bodyId, { -extent.x, -extent.y });
+        position = {pos.x, pos.y};
 
-    if (isLifeTimeSet && GetTime() > destroyTime)
-        QueueDestroy();
+        if (bodyType != STATIC)
+        {
+            if (destroyByScreen)
+            {
+                if (position.x < 0 || position.x > Engine::GetInternalResolution().x || position.y < 0 || position.y > Engine::GetInternalResolution().y)
+                    QueueDestroy();
+            }
+        }
+        
+        playSoundOnCollision();
+
+        if (isLifeTimeSet && GetTime() > destroyTime)
+            QueueDestroy();
+
+    }
 }
 
 void PhysicsRectangle::SetPadding(float padding)
@@ -107,4 +116,41 @@ void PhysicsRectangle::SetLifeTime(float time)
 {
     isLifeTimeSet = true;
     destroyTime = GetTime() + time;
+}
+
+void PhysicsRectangle::playSoundOnCollision()
+{
+    if (soundOnCollision != "")
+    {        
+        int bodyContactCapacity = b2Body_GetContactCapacity(bodyId);
+        b2ContactData* contactData = new b2ContactData[bodyContactCapacity];
+        int bodyContactCount = b2Body_GetContactData(bodyId, contactData, bodyContactCapacity);
+
+        if (bodyContactCount > 0)
+        {
+            // Engine::PlayAudio(soundOnCollision);
+            for (int i = 0; i < bodyContactCapacity && i < bodyContactCount; i++)
+            {
+                b2ContactData* data = contactData + i;
+                bool playSound = false;
+
+                for (int i = 0; i < data->manifold.pointCount; i++)
+                {
+                    b2ManifoldPoint point = data->manifold.points[i];
+                    
+                    if (point.normalVelocity > abs(collisionVelocityToPlaySound))
+                    {
+                        playSound = true;
+                        break;
+                    }
+                }
+                
+                if (playSound)
+                {
+                    Engine::PlayAudio(soundOnCollision);
+                }
+
+            }
+        }
+    }
 }

@@ -29,6 +29,9 @@ Enemy::Enemy() : Character()
 
 void Enemy::Die(Vector2 reactionDirection, float reactionForce, bool dismember)
 {
-    Game::EnemiesLeft--;
-    Character::Die(reactionDirection, reactionForce, dismember);
+    if (!dead)
+    {
+        Game::EnemiesLeft--;
+        Character::Die(reactionDirection, reactionForce, dismember);
+    }
 }

@@ -29,6 +29,8 @@ public:
     b2ShapeId GetShapeId() { return shapeId; }
     Vector2 GetPosition() { return position; }
     void SetLifeTime(float time);
+    void SetSoundOnCollision(std::string soundName) { soundOnCollision = soundName; }
+    void SetCollisionVelocityToPlaySound(float velocity) { collisionVelocityToPlaySound = velocity; }
 
 protected: 
     Vector2 position = {0};
@@ -40,6 +42,9 @@ protected:
     float padding = 0;
     bool isLifeTimeSet = false;
     double destroyTime = 0;
+    bool destroyByScreen = true; 
+    std::string soundOnCollision = "";
+    float collisionVelocityToPlaySound = 20;
 
     BodyType bodyType = BodyType::DYNAMIC;
     b2BodyDef bodyDef;
@@ -49,4 +54,5 @@ protected:
     b2ShapeId shapeId;
     b2Vec2 extent;
     
+    void playSoundOnCollision();
 };

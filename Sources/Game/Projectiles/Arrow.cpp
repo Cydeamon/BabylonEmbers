@@ -1,6 +1,5 @@
 #include "Arrow.h"
-#include <iostream>
-#include <string>
+#include "box2d/math_functions.h"
 #include <Engine/Engine.h>
 #include <Game/PhysicsCategory.h>
 #include <Game/Brick.h>
@@ -19,13 +18,28 @@ Arrow::Arrow(Vector2 initPosition, Vector2 size) : PhysicsRectangle(initPosition
 
     float arrowAngle = atan2(Engine::GetMousePositionScaled().y - initPosition.y, Engine::GetMousePositionScaled().x - initPosition.x);
     this->SetRotation(b2Rot{cos(arrowAngle), sin(arrowAngle)});
-    this->SetVelocity({350 * cos(arrowAngle), 350 * sin(arrowAngle)});
+    this->SetVelocity({185 * cos(arrowAngle), 185 * sin(arrowAngle)});
+    destroyByScreen = false;
 }
 
 void Arrow::Update() 
 {
     PhysicsRectangle::Update();
     processCollisions();
+}
+
+void Arrow::Draw()
+{
+    b2Vec2 velocity = b2Body_GetLinearVelocity(bodyId);
+    double angleInRadians = atan2(velocity.y, velocity.x);    
+    double angleInDegrees = angleInRadians * (180.0 / PI);
+
+    DrawRectanglePro(
+        {position.x,position.y, size.x, size.y },
+        {0}, 
+        angleInDegrees,
+        color
+    );
 }
 
 void Arrow::processCollisions()
@@ -55,8 +69,13 @@ void Arrow::processCollisions()
                     {
                         b2Vec2 hitDirection = {(enemy->GetPosition().x + 8) - position.x, (enemy->GetPosition().y) - position.y + 8};
                         hitDirection = b2Normalize(hitDirection);
-                        enemy->Die({hitDirection.x, hitDirection.y}, 1000);
+                        enemy->Die({hitDirection.x, hitDirection.y}, 1000 + (rand() % 1000));
                         characterHit = true;
+                        Engine::PlayAudio("HitCharacter");
+                    }
+                    else
+                    {
+                        Engine::PlayAudio("HitEnvironment");
                     }
 
                     QueueDestroy();

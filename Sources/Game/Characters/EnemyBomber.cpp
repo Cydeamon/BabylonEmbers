@@ -7,9 +7,10 @@
 
 EnemyBomber::EnemyBomber() : Enemy()
 {
-    spritesheetTextureAttack = Engine::LoadTextureFromTexturePool("Assets/EnemyBomberAttack.png");
-    spritesheetTextureRunning = Engine::LoadTextureFromTexturePool("Assets/EnemyBomberRun.png");
+    spritesheetTextureAttack = Engine::LoadTextureFromTexturePool("Assets/Textures/EnemyBomberAttack.png");
+    spritesheetTextureRunning = Engine::LoadTextureFromTexturePool("Assets/Textures/EnemyBomberRun.png");
     b2Shape_SetUserData(physShapeId, this);
+    stopX = 150 + (rand() % 30) - 15;
 }
 
 void EnemyBomber::Update()
@@ -35,6 +36,8 @@ void EnemyBomber::Update()
 
         if (state == RUNNING)    
         {
+            playStepsSounds = true;
+
             // Move in direction
             if (Player::BelowThreshold)
                 moveDirection = {Player::Position.x < 0 ? -1.0f : 1.0f, 0};
@@ -50,8 +53,12 @@ void EnemyBomber::Update()
             if (Player::BelowThreshold)
                 distance = abs(Player::Position.x - position.x);
 
-            if (distance < 150)
+            if (distance < stopX)
                 state = EnemyBomber::ATTACK;
+        }
+        else
+        {
+            playStepsSounds = false;
         }
 
         if (GetTime() - waitTimeStart > waitTimeAfterThrow)

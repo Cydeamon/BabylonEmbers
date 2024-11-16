@@ -8,24 +8,38 @@
 
 Character::Character()
 {
-    ragdollHeadTexture = Engine::LoadTextureFromTexturePool("Assets/CharacterRagDollHead.png");
-    ragdollBodyTexture = Engine::LoadTextureFromTexturePool("Assets/CharacterRagDollBody.png");
-    ragdollLegsTexture = Engine::LoadTextureFromTexturePool("Assets/CharacterRagDollLegs.png");
+    ragdollHeadTexture = Engine::LoadTextureFromTexturePool("Assets/Textures/CharacterRagDollHead.png");
+    ragdollBodyTexture = Engine::LoadTextureFromTexturePool("Assets/Textures/CharacterRagDollBody.png");
+    ragdollLegsTexture = Engine::LoadTextureFromTexturePool("Assets/Textures/CharacterRagDollLegs.png");
     lastFrameTime = GetTime();
 
     initPhysicsBody();
     SetDrawPriority(LOW);
-    bloodParticlesLeft = rand() % 50 + rand() % 50;
+    bloodParticlesLeft = rand() % 10 + rand() % 40;
+
+    useBleedingBursts = rand() % 2 == 0;
+    randomizeBleedBurstsValues();
 }
 
 Character::~Character()
 {
 }
 
+void Character::randomizeBleedBurstsValues()
+{
+    bleedBurstsIntervalCur = 
+        bleedBurstsIntervalMin + 
+        static_cast <float> (rand()) / (static_cast <float> (RAND_MAX/(bleedBurstsIntervalMax-bleedBurstsIntervalMin)));
+
+    bleedBurstCurParticlesLeft = bleedBurstMinBloodParticles + rand() % (bleedBurstMaxBloodParticles - bleedBurstMinBloodParticles);
+}
+
 void Character::Update()
 {
     if (!Player::IsAlive)
         return;
+
+    handleAudio();
 
     if (!dead)
     {
@@ -60,8 +74,36 @@ void Character::Update()
             QueueDestroy();
         else
         {
-            if (bloodParticlesLeft > 0 && GetTime() - lastBleedTime > bleedInterval)
-                dropBloodParticle();
+            if (bloodParticlesLeft > 0)
+            {
+                if (useBleedingBursts)
+                {
+                    if (GetTime() - lastBleedBurstTime > bleedBurstsIntervalCur)
+                    {
+                        if (bleedBurstCurParticlesLeft > 0 )
+                        {
+                            if (GetTime() - lastBleedTime > bleedInterval)
+                            {
+                                dropBloodParticle();                    
+                                bleedBurstCurParticlesLeft--;
+                            }
+                        }
+                        else
+                        {
+                            randomizeBleedBurstsValues();
+                            lastBleedBurstTime = GetTime();
+                        }
+                    }
+                }
+                else
+                {
+                    if (GetTime() - lastBleedTime > bleedInterval)
+                    {
+                        dropBloodParticle();                    
+                        bleedBurstCurParticlesLeft--;
+                    }
+                }
+            } 
 
             b2Vec2 pos = b2Body_GetWorldPoint(ragdollBodyId, { -extent.x, -extent.y });
             position = {pos.x, pos.y};
@@ -118,7 +160,7 @@ void Character::Draw()
                 {position.x,position.y, size.x, size.y},
                 {0}, 
                 RAD2DEG * b2Rot_GetAngle(b2Body_GetRotation(physBodyId)), 
-                RED
+                WHITE
             );
         }
     }
@@ -350,4 +392,26 @@ void Character::dropBloodParticle()
     bloodParticlesLeft--;
     bleedInterval = 1.0 / (rand() % 1 + 23);
     lastBleedTime = GetTime();
+
+    // Engine::PlayAudio("Bleed");
+}
+
+void Character::handleAudio()
+{
+    if (!dead)
+    {
+        if (playStepsSounds)
+        {
+            if (GetTime() - lastStepTime > stepsInterval)
+            {
+                lastStepTime = GetTime();
+
+                if (isPlayer)
+                    Engine::PlayAudio("StepStone");
+                else
+                    Engine::PlayAudio("Step");
+
+            }
+        }
+    }
 }

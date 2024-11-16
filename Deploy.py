@@ -4,7 +4,7 @@ import shutil
 import re
 import time
 
-itch_project_path = "cydeamon/tower-defender"
+itch_project_path = "cydeamon/babylon-embers"
 
 class bcolors:
     HEADER = '\033[95m'

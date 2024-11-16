@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5.0)
-project(BabylonEmbers VERSION 1.1.0)
+project(BabylonEmbers VERSION 1.3.13)
 set (CMAKE_CXX_STANDARD 20)
 set (PROJECT_LABEL "Babylon Embers")
 

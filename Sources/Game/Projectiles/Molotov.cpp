@@ -17,6 +17,7 @@ Molotov::Molotov(Vector2 initPosition, Vector2 size) : PhysicsRectangle(initPosi
     float throwAngleCompensation = xDistanceToPlayer > 50 ? 20 : 30;
     bool playerOnTheRight = Player::Position.x - position.x > 0;
     float angleToPlayer = atan2(Player::Position.y - position.y, Player::Position.x - position.x);
+    destroyByScreen = false;
 
     if (!Player::IsGrounded)
         angleToPlayer -= (throwAngleCompensation * DEG2RAD) * (playerOnTheRight ? 1 : -1);
@@ -36,6 +37,8 @@ Molotov::Molotov(Vector2 initPosition, Vector2 size) : PhysicsRectangle(initPosi
     );
 
     b2Body_ApplyLinearImpulseToCenter(bodyId, force, true);
+
+    Engine::PlayAudio("MolotovThrow");
 }
 
 void Molotov::Update() 
@@ -81,4 +84,5 @@ void Molotov::Explode()
     }
 
     QueueDestroy();
+    Engine::PlayAudio("MolotovBreaking");
 }
