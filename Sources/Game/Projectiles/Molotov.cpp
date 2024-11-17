@@ -1,4 +1,5 @@
 #include "Molotov.h"
+#include "Arrow.h"
 #include <iostream>
 #include <string>
 #include <Engine/Engine.h>
@@ -22,7 +23,7 @@ Molotov::Molotov(Vector2 initPosition, Vector2 size) : PhysicsRectangle(initPosi
     if (!Player::IsGrounded)
         angleToPlayer -= (throwAngleCompensation * DEG2RAD) * (playerOnTheRight ? 1 : -1);
 
-    float maxForce = 350 - (50 - (rand() % 100));
+    float maxForce = (350 - (50 - (rand() % 100))) * 3;
     b2Vec2 force = {maxForce, 0};
     force = b2RotateVector({cos(angleToPlayer), sin(angleToPlayer)}, force);
 
@@ -64,8 +65,30 @@ void Molotov::processCollisions()
         {
             if (contacts[j] && !blownUp)
             {
-                QueueDestroy();
-                Explode();
+                GameObject* other = (GameObject*) contacts[j];
+                Arrow* arrow = dynamic_cast<Arrow*>(other);
+                
+                if (other == this)
+                    continue;
+
+                if (!other->IsDestroyQueued())
+                {
+                    if (arrow)
+                    {
+                        b2Body_ApplyLinearImpulseToCenter(
+                            bodyId, 
+                            {
+                                data->manifold.points[0].anchorA.x * (data->manifold.points[0].normalImpulse * 6), 
+                                data->manifold.points[0].anchorA.y * (data->manifold.points[0].normalImpulse * 6)
+                            }, 
+                            true
+                        );
+                        return; 
+                    }
+                    
+                    QueueDestroy();
+                    Explode();
+                }
             }
         }        
     }

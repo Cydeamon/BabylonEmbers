@@ -1,6 +1,8 @@
 #include "FlameParticle.h"
 #include "Engine/Engine.h"
 #include "Engine/GameObjects/PhysicsRectangle.h"
+#include "box2d/box2d.h"
+#include <cstdlib>
 #include <math.h>
 #include <Game/PhysicsCategory.h>
 #include <Game/Characters/Player.h>
@@ -52,6 +54,7 @@ void FlameParticle::Update()
         smoke->SetColor(BLACK);
         Engine::SetPhysFilterCategories(smoke->GetShapeId(), 0, 0);
         b2Body_SetGravityScale(smoke->GetBodyId(), -1);
+        b2Body_SetLinearVelocity(smoke->GetBodyId(), {-((rand() % 40) + 10), 1});
         smoke->SetLifeTime((rand() % 100) / 100.0f);
         
         nextSmokeTime = GetTime() + (((rand() % (int) smokeIntervalMax * 100) / 100.0f) + smokeIntervalMin);
@@ -97,7 +100,10 @@ void FlameParticle::processCollisions()
                 Player* player = dynamic_cast<Player*>(other);
                 
                 if (player)
+                {
+                    player->ReasonDead = "Molotov flame";
                     player->Die();
+                }
                 else 
                 if (enemy)
                     enemy->Die();

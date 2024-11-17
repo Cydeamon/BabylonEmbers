@@ -63,6 +63,7 @@ void Bullet::processCollisions()
             {
                 Brick* brick = dynamic_cast<Brick*>(contacts[j]);
                 Character* character = dynamic_cast<Character*>(contacts[j]);
+                Player* player = dynamic_cast<Player*>(contacts[j]);
                 
                 if (brick)
                 {
@@ -76,6 +77,9 @@ void Bullet::processCollisions()
                     hitDirection = b2Normalize(hitDirection);
                     character->Die({-hitDirection.x, hitDirection.y}, 1000, true);
                     Engine::PlayAudio("BulletHitCharacter");
+
+                    if (player)
+                        Player::ReasonDead = "Bullet hit";
                 }
                 else
                 {

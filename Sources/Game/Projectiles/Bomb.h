@@ -9,6 +9,7 @@ public:
     Bomb(Enemy *thrower, Vector2 lookDirection, Vector2 initPosition, Vector2 size = {5, 1});
     Bomb(Enemy* thrower, Vector2 initPosition, Vector2 size = {2, 2});
     void Update() override;
+    void Explode();
     
 private: 
     Enemy *thrower;
@@ -17,6 +18,5 @@ private:
     float blowTime = 5;
     double countStartTime;
     
-    void explode();
     void processCollisions();
 };

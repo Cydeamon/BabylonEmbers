@@ -18,6 +18,7 @@ public:
     static bool IsGrounded;
     static bool IsAlive;
     static bool BelowThreshold;
+    static std::string ReasonDead;
 
 private:
     Texture2D spritesheetTextureIdle;

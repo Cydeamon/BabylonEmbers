@@ -1,4 +1,6 @@
 #include "Arrow.h"
+#include "Game/Projectiles/Bomb.h"
+#include "Molotov.h"
 #include "box2d/math_functions.h"
 #include <Engine/Engine.h>
 #include <Game/PhysicsCategory.h>
@@ -10,7 +12,7 @@ Arrow::Arrow(Vector2 initPosition, Vector2 size) : PhysicsRectangle(initPosition
     Engine::SetPhysFilterCategories(
         shapeId, 
         GamePhysicsCategories::ARROW, 
-        GamePhysicsCategories::ENEMY | GamePhysicsCategories::TOWER_BRICK
+        GamePhysicsCategories::ENEMY | GamePhysicsCategories::TOWER_BRICK | BOMB
     );
 
     b2Shape_SetDensity(shapeId, 0);
@@ -64,6 +66,8 @@ void Arrow::processCollisions()
                     GameObject* other = (GameObject*) contacts[j];
                     Brick* brick = dynamic_cast<Brick*>(other);
                     Enemy* enemy = dynamic_cast<Enemy*>(other);
+                    Bomb* bomb = dynamic_cast<Bomb*>(other);
+                    Molotov * molotov = dynamic_cast<Molotov*>(other);
 
                     if (enemy)
                     {
@@ -78,6 +82,11 @@ void Arrow::processCollisions()
                         Engine::PlayAudio("HitEnvironment");
                     }
 
+                    if (bomb)
+                    {
+                        bomb->Explode();
+                    }
+                    
                     QueueDestroy();
                 }
             }

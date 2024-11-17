@@ -1,5 +1,6 @@
 #include "Brick.h"
 #include "Game/Characters/Character.h"
+#include "Game/Characters/Player.h"
 #include <iostream>
 #include <Engine/Engine.h>
 #include <Game/PhysicsCategory.h>
@@ -126,6 +127,7 @@ void Brick::processCollisions()
             {
                 GameObject* other = (GameObject*) contacts[j];
                 Character* character = dynamic_cast<Character*>(other);
+                Player* player = dynamic_cast<Player*>(other);
 
                 if (character)
                 {                    
@@ -134,7 +136,12 @@ void Brick::processCollisions()
                         b2ManifoldPoint point = data->manifold.points[k];
                         
                         if (point.normalImpulse > 50)
+                        {
                             character->Die({point.anchorA.x, point.anchorA.y}, point.normalImpulse);
+
+                            if (player)
+                                Player::ReasonDead = "Brick fall";
+                        }
                     }
                 }
             }

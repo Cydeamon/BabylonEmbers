@@ -3,6 +3,7 @@
 #include "Engine/GameObjects/GameObject.h"
 #include "Engine/Vendor/Box2D/src/body.h"
 #include "Game/Characters/Character.h"
+#include "Game/Characters/Player.h"
 #include "PhysicsCategory.h"
 #include "box2d/box2d.h"
 #include <iostream>
@@ -109,6 +110,7 @@ void TowerTop::processCollisions()
             {
                 GameObject* other = (GameObject*) contacts[j];
                 Character* character = dynamic_cast<Character*>(other);
+                Player* player = dynamic_cast<Player*>(other);
 
                 if (character)
                 {                    
@@ -117,7 +119,12 @@ void TowerTop::processCollisions()
                         b2ManifoldPoint point = data->manifold.points[k];
                         
                         if (point.normalImpulse > 500)
+                        {
                             character->Die({point.anchorA.x, point.anchorA.y}, point.normalImpulse);
+
+                            if (player)
+                                Player::ReasonDead = "Tower top fall";
+                        }
                      }
                 }
             }

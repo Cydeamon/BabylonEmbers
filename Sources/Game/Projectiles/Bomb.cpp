@@ -68,7 +68,7 @@ void Bomb::Update()
     if (GetTime() - countStartTime > blowTime)
     {
         QueueDestroy();
-        explode();
+        Explode();
     }    
 }
 
@@ -90,13 +90,13 @@ void Bomb::processCollisions()
             if (contacts[j] && !blownUp)
             {
                 QueueDestroy();
-                explode();
+                Explode();
             }
         }        
     }
 }
 
-void Bomb::explode()
+void Bomb::Explode()
 {
     // Get objects in radius of explosion
     std::map<GameObject*, Vector2> objects = Engine::GetObjectsInRadius(explosionRadius, position);
@@ -118,7 +118,10 @@ void Bomb::explode()
         }
 
         if (player)
+        {
+            player->ReasonDead = "Bomb explosion";
             player->Die(relativeToCenter, 250, true);
+        }
 
         if (enemy)
             enemy->Die(relativeToCenter, 250, true);

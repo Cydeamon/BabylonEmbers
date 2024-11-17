@@ -6,7 +6,7 @@
 class Molotov : public PhysicsRectangle
 {
 public:
-    Molotov(Vector2 initPosition, Vector2 size = {1, 2});
+    Molotov(Vector2 initPosition, Vector2 size = {2, 3});
     void Update() override;
     void Explode();
     

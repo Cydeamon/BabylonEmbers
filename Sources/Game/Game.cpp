@@ -10,6 +10,7 @@
 #include "box2d/box2d.h"
 #include "raylib.h"
 #include <filesystem>
+#include <algorithm>
 
 int Game::EnemiesLeft = 0;
 
@@ -31,8 +32,9 @@ void Game::Run()
 {
     while (Engine::IsRunning())
     {   
-        // Update 
-        Engine::Update();
+        if (!isLevelTransition && !gameOver)
+            Engine::Update();
+
         Engine::Draw();
         
         if (gameIsStarted)
@@ -209,6 +211,13 @@ void Game::showEndGameScreen()
     Vector2 line1size = MeasureTextEx(font, msg.c_str(), 40, 0);
     bgHeight += line1size.y + messagesPadding;
 
+    std::string reasonString = "REASON: " + Player::ReasonDead;
+    std::transform(reasonString.begin(), reasonString.end(), reasonString.begin(),
+                   [](unsigned char c){ return std::toupper(c); });
+
+    Vector2 reasonDeadMsgSize = MeasureTextEx(font, reasonString.c_str(), 8, 0);
+    bgHeight += reasonDeadMsgSize.y + messagesPadding;
+
     char restartMsg[64];
     sprintf(restartMsg, "PRESS [R] TO RESTART");
     Vector2 line2size = MeasureTextEx(font, restartMsg, 16, 0);
@@ -216,7 +225,8 @@ void Game::showEndGameScreen()
 
     drawUIBackground(bgY - messagesPadding, bgHeight);
     DrawTextEx(font, msg.c_str(), {centerX - (line1size.x / 2), Engine::GetInternalResolution().y / 2 - 50}, 40, 0, BLACK);
-    DrawTextEx(font, restartMsg, {centerX - (line2size.x / 2), Engine::GetInternalResolution().y / 2}, 16, 0, BLACK);
+    DrawTextEx(font, reasonString.c_str(), {centerX - (reasonDeadMsgSize.x / 2), Engine::GetInternalResolution().y / 2 - 6}, 8, 0, BLACK);
+    DrawTextEx(font, restartMsg, {centerX - (line2size.x / 2), Engine::GetInternalResolution().y / 2 + 10}, 16, 0, BLACK);
 }
 
 void Game::drawUI()

@@ -13,6 +13,7 @@ Vector2 Player::Position = {0};
 bool Player::IsGrounded = false;
 bool Player::IsAlive = true;
 bool Player::BelowThreshold = false;
+std::string Player::ReasonDead = "NOT SET";
 
 Player::Player() : Character()
 {
@@ -41,6 +42,7 @@ void Player::Update()
         if (position.x + size.x < 0 || position.x - size.x > Engine::GetInternalResolution().x || 
             position.y + size.y < 0 || position.y - size.y > Engine::GetInternalResolution().y)
         {
+            ReasonDead = "Out of bounds";
             Die();
             return;
         }
