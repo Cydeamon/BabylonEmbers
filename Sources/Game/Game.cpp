@@ -211,7 +211,7 @@ void Game::showEndGameScreen()
     Vector2 line1size = MeasureTextEx(font, msg.c_str(), 40, 0);
     bgHeight += line1size.y + messagesPadding;
 
-    std::string reasonString = "REASON: " + Player::ReasonDead;
+    std::string reasonString = "CAUSE OF DEATH: " + Player::ReasonDead;
     std::transform(reasonString.begin(), reasonString.end(), reasonString.begin(),
                    [](unsigned char c){ return std::toupper(c); });
 

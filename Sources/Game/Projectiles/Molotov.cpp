@@ -73,19 +73,6 @@ void Molotov::processCollisions()
 
                 if (!other->IsDestroyQueued())
                 {
-                    if (arrow)
-                    {
-                        b2Body_ApplyLinearImpulseToCenter(
-                            bodyId, 
-                            {
-                                data->manifold.points[0].anchorA.x * (data->manifold.points[0].normalImpulse * 6), 
-                                data->manifold.points[0].anchorA.y * (data->manifold.points[0].normalImpulse * 6)
-                            }, 
-                            true
-                        );
-                        return; 
-                    }
-                    
                     QueueDestroy();
                     Explode();
                 }
