@@ -118,7 +118,7 @@ void TowerTop::processCollisions()
                     {
                         b2ManifoldPoint point = data->manifold.points[k];
                         
-                        if (point.normalImpulse > 500)
+                        if (point.normalImpulse > 750)
                         {
                             character->Die({point.anchorA.x, point.anchorA.y}, point.normalImpulse);
 
