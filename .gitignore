@@ -1,5 +1,9 @@
 build
 Bin/
 Deploy/
-*.in
+Config.h
+resource.rc
 .cache
+cmake-build-*
+.idea
+.vscode

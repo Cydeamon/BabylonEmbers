@@ -129,7 +129,7 @@ if len(executables) == 0:
     print(bcolors.FAIL + "No executable found!" + bcolors.ENDC)
     exit(1)
 
-# Path to the deploy folder
+# Path to the deployment folder
 deploy_folder = "./Deploy/" + platform.system() + "/" + project_version + "/"
 
 # Delete folder if exists
@@ -166,13 +166,13 @@ for executable_path in executables:
             else:
                 print(bcolors.FAIL + "Library not found: " + line.split("=>")[0].strip())
 
-    # Copy the libraries to the deploy folder
+    # Copy the libraries to the deployment folder
     for library_path in library_paths:
         print(
             bcolors.OKGREEN + "Copying library: " + library_path + " to deploy folder: " + deploy_folder + bcolors.ENDC)
         shutil.copy(library_path, deploy_folder + "Bin/")
 
-    # Copy the executable to the deploy folder
+    # Copy the executable to the deployment folder
     shutil.copy(executable_path, deploy_folder + "Bin/")
 
 # Copy allowed files to deploy folder

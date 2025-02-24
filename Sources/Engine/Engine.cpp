@@ -98,7 +98,7 @@ namespace Engine
 
     bool IsDebug()
     {
-        return false;//PROJECT_BUILD_TYPE == "Debug";
+        return PROJECT_BUILD_TYPE == "Debug";
     }
 
     void Draw()
@@ -144,11 +144,16 @@ namespace Engine
         if (target.id)
             UnloadRenderTexture(target);
 
+        Vector2 targetWinSize =
+            fullscreen
+            ? Vector2{(float) GetMonitorWidth(GetCurrentMonitor()), (float) GetMonitorHeight(GetCurrentMonitor())}
+            : Vector2{(float) GetMonitorWidth(GetCurrentMonitor()) / 2, (float) GetMonitorHeight(GetCurrentMonitor()) / 2};
+
         internalResolution = resolution;
         renderRatio = internalResolution.x / internalResolution.y;
         target = LoadRenderTexture(internalResolution.x, internalResolution.y);
         sourceRec = { 0.0f, 0.0f, (float)target.texture.width, -(float)target.texture.height };
-        destRec = { -renderRatio, -renderRatio, GetScreenWidth() + (renderRatio*2), GetScreenHeight() + (renderRatio*2) };
+        destRec = { -renderRatio, -renderRatio, targetWinSize.x + (renderRatio*2), targetWinSize.y + (renderRatio*2) };
     }
     
     void RegisterGameObject(GameObject* obj)
@@ -224,7 +229,7 @@ namespace Engine
             else
             { 
                 SetWindowSize(GetMonitorWidth(curMonitor), GetMonitorHeight(curMonitor));
-                SetWindowPosition(0, 50);
+                SetWindowPosition(0, 0);
                 ToggleBorderlessWindowed();
             }
 
